@@ -14,7 +14,7 @@ def read_query(action):
         logging.error(f'Could not find {action}.sql file.')
     return sql_query
 
-def create_database(company_host:int,company_user,company_password,company_db_name):
+def create_database(company_host,company_user,company_password,company_db_name):
     mydb=mysql.connector.connect(
         host=company_host,
         user=company_user,
@@ -24,7 +24,7 @@ def create_database(company_host:int,company_user,company_password,company_db_na
     company_cursor.execute(f"CREATE DATABASE IF NOT EXISTS {company_db_name};")
     return print("Database succesfully created!")
 
-def delete_database(company_host:int,company_user,company_password,company_db_name):
+def delete_database(company_host,company_user,company_password,company_db_name):
     you_sure=input(f"Are you sure u want to delete {company_db_name} forever? (That is a lot of time!). If sure, type Yes, otherwise type anything you want.")
     if you_sure=="Yes":
         mydb=mysql.connector.connect(
@@ -60,9 +60,9 @@ def ask_for_data():
 
 def use_env_file():
     load_dotenv('server_data.env')
+    COMPANY_HOST=os.getenv('COMPANY_HOST')
     COMPANY_USERNAME=os.getenv('COMPANY_USERNAME')
     COMPANY_PASSWORD=os.getenv('COMPANY_PASSWORD')
-    COMPANY_HOST=os.getenv('COMPANY_HOST')
     return[COMPANY_USERNAME,COMPANY_PASSWORD,COMPANY_HOST]
 
 option=(input("Hello, Welcome to this Accounting Software! Please enter the number of the action you would like to do: \n 1- Create New Database. \n 2- Delete an existing Database. \n 3- Operate with an existing Database.\n 4- Close the Program.\n Answer: "))
