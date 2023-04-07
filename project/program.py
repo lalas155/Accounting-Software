@@ -58,22 +58,26 @@ def ask_for_data():
     password=input("Please insert password (leave empty if there is no password): ")
     return [host,user,password]
 
+def use_env_file():
+    load_dotenv('server_data.env')
+    COMPANY_USERNAME=os.getenv('COMPANY_USERNAME')
+    COMPANY_PASSWORD=os.getenv('COMPANY_PASSWORD')
+    COMPANY_HOST=os.getenv('COMPANY_HOST')
+    return[COMPANY_USERNAME,COMPANY_PASSWORD,COMPANY_HOST]
+
 option=(input("Hello, Welcome to this Accounting Software! Please enter the number of the action you would like to do: \n 1- Create New Database. \n 2- Delete an existing Database. \n 3- Operate with an existing Database.\n 4- Close the Program.\n Answer: "))
 
 while option not in ["1","2","3","4"]:
         option=(input("Please enter the number of the action you would like to do: \n 1- Create New Database. \n 2- Delete an existing Database. \n 3- Operate with an existing Database.\n 4- Close the Program.\n Answer: "))
 if option=="1":
-    use_env_file=input("Would you like to import Server data from .env file? Type 'Yes' if you would like to, otherwise type 'No'.\n Answer: ")
-    while use_env_file not in ["Yes","No"]:
-        use_env_file=input("Would you like to import Server data from .env file? Type 'Yes' if you would like to, otherwise type 'No'.\n Answer: ")
-    if use_env_file=="Yes":
-        load_dotenv('server_data.env')
-        COMPANY_USERNAME=os.getenv('COMPANY_USERNAME')
-        COMPANY_PASSWORD=os.getenv('COMPANY_PASSWORD')
-        COMPANY_HOST=os.getenv('COMPANY_HOST')
+    use_env_file_=input("Would you like to import Server data from .env file? Type 'Yes' if you would like to, otherwise type 'No'.\n Answer: ")
+    while use_env_file_ not in ["Yes","No"]:
+        use_env_file_=input("Would you like to import Server data from server_data.env file? Type 'Yes' if you would like to, otherwise type 'No'.\n Answer: ")
+    if use_env_file_=="Yes":
+        env_data=use_env_file()
         database_name=input("Please insert desired Database name (default localhost if using XAMPP): ")
-        create_database(COMPANY_HOST,COMPANY_USERNAME,COMPANY_PASSWORD,f"{database_name}")
-        create_tables(COMPANY_HOST,COMPANY_USERNAME,COMPANY_PASSWORD,f"{database_name}")
+        create_database(env_data[0],env_data[1],env_data[2],f"{database_name}")
+        create_tables(env_data[0],env_data[1],env_data[2],f"{database_name}")
     elif use_env_file=="No":
         try:
             data=ask_for_data()
@@ -84,7 +88,7 @@ if option=="1":
         except DatabaseError as er:
             print(er)
     else:
-        option=input("Please inser a valid answer: ")
+        option=input("Please inser a valid answer('Yes' or 'No'): ")
 elif option=="2":
         try:
             data=ask_for_data()
