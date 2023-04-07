@@ -54,10 +54,3 @@ CREATE TABLE IF NOT EXISTS sales_bills_invoices_docs(
     total_invoice_ticket_amount INT(40),
     FOREIGN KEY (client_id) REFERENCES clients(client_id)
 );
-
-/* USE coca_cola;
-DROP TABLE buys_bills_invoices_docs;
-DROP TABLE sales_bills_invoices_docs;
-DROP TABLE general_journal;
-DROP TABLE clients;
-DROP TABLE vendors; */
