@@ -40,7 +40,6 @@ def delete_database(company_host:int,company_user,company_password,company_db_na
         print("Operation Cancelled!")
 
 def create_tables(company_host:int,company_user,company_password,company_db_name):
-    create_database(company_host,company_user,company_password,company_db_name)
     mydb=mysql.connector.connect(
         host=company_host,
         user=company_user,
@@ -63,7 +62,6 @@ option=(input("Hello, Welcome to this Accounting Software! Please enter the numb
 
 while option not in ["1","2","3","4"]:
         option=(input("Please enter the number of the action you would like to do: \n 1- Create New Database. \n 2- Delete an existing Database. \n 3- Operate with an existing Database.\n 4- Close the Program.\n Answer: "))
-
 if option=="1":
     use_env_file=input("Would you like to import Server data from .env file? Type 'Yes' if you would like to, otherwise type 'No'.\n Answer: ")
     while use_env_file not in ["Yes","No"]:
@@ -74,18 +72,19 @@ if option=="1":
         COMPANY_PASSWORD=os.getenv('COMPANY_PASSWORD')
         COMPANY_HOST=os.getenv('COMPANY_HOST')
         database_name=input("Please insert desired Database name (default localhost if using XAMPP): ")
-        create_tables(COMPANY_HOST,COMPANY_USERNAME,COMPANY_PASSWORD,f"{database_name}") 
+        create_database(COMPANY_HOST,COMPANY_USERNAME,COMPANY_PASSWORD,f"{database_name}")
+        create_tables(COMPANY_HOST,COMPANY_USERNAME,COMPANY_PASSWORD,f"{database_name}")
     elif use_env_file=="No":
         try:
             data=ask_for_data()
             database_name=input("Please insert desired Database name: ")
+            create_database(data[0],data[1],data[2],f"{database_name}")
             create_tables(data[0],data[1],data[2],f"{database_name}")
             print(f"{database_name} Database succesfully created!")
         except DatabaseError as er:
             print(er)
     else:
         option=input("Please inser a valid answer: ")
-        
 elif option=="2":
         try:
             data=ask_for_data()
@@ -95,6 +94,5 @@ elif option=="2":
             print(er)
 elif option == "4":
     print("Closing program! Have a nice day.")
-
 elif option == "3":
-    pass
+    ask_for_data()
