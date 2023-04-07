@@ -59,10 +59,10 @@ def ask_for_data():
     password=input("Please insert password (leave empty if there is no password): ")
     return [host,user,password]
 
-option=(input("Hello, Welcome to this Accounting Software! Please enter the number of the action you would like to do: \n 1- Create New Database. \n 2- Delete an existing Database. \n 3- Operate with an existing Database.\n 4- Close the Program.\n Selection: "))
+option=(input("Hello, Welcome to this Accounting Software! Please enter the number of the action you would like to do: \n 1- Create New Database. \n 2- Delete an existing Database. \n 3- Operate with an existing Database.\n 4- Close the Program.\n Answer: "))
 
 while option not in ["1","2","3","4"]:
-        option=(input("Please enter the number of the action you would like to do: \n 1- Create New Database. \n 2- Delete an existing Database. \n 3- Operate with an existing Database.\n 4- Close the Program.\n Selection: "))
+        option=(input("Please enter the number of the action you would like to do: \n 1- Create New Database. \n 2- Delete an existing Database. \n 3- Operate with an existing Database.\n 4- Close the Program.\n Answer: "))
 
 if option=="1":
     use_env_file=input("Would you like to import Server data from .env file? Type 'Yes' if you would like to, otherwise type 'No'.\n Answer: ")
@@ -89,9 +89,12 @@ if option=="1":
 elif option=="2":
         try:
             data=ask_for_data()
-            database_name=input("Please insert Database name (default localhost if using XAMPP): ")
+            database_name=input("Please insert Database name: ")
             delete_database(data[0],data[1],data[2],database_name)
         except DatabaseError as er:
             print(er)
-elif option=="4":
-    print("See ya!")
+elif option == "4":
+    print("Closing program! Have a nice day.")
+
+elif option == "3":
+    pass
