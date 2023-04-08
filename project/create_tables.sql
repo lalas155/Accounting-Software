@@ -5,10 +5,13 @@ CREATE TABLE IF NOT EXISTS vendors(
 );
 
 CREATE TABLE IF NOT EXISTS clients(
-    client_id VARCHAR(11) NOT NULL DEFAULT "20222222223",
-    client_name VARCHAR(50) NOT NULL DEFAULT "anonymous client",
+    client_id VARCHAR(11) NOT NULL,
+    client_name VARCHAR(50) NOT NULL,
     PRIMARY KEY(client_id)
 );
+
+INSERT INTO clients VALUES
+("20222222223", "Anonymous Client");
 
 CREATE TABLE IF NOT EXISTS general_journal(
     operation_date VARCHAR(10) NOT NULL,
