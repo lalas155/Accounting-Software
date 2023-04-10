@@ -40,7 +40,13 @@ def delete_database(company_host,company_user,company_password,company_db_name):
     else:
         print("Operation Cancelled!")
 
-def connect_and_execute_query(company_host,company_user,company_password,company_db_name,query_action,output:bool):
+def connect_and_execute_query(company_host,company_user,company_password,company_db_name,query_action,results:bool):
+
+    """
+    This function will attempt to connect to MySQL database using company host, user, password and database name as inputs.\n 
+    After that, it will execute a MySQL query which name has the format 'query_that_query_file_will_perform.sql'. If 'results' is ser to 'True', results from query, if there is any, will be returned as a list.
+    """
+
     mydb = mysql.connector.connect(
                                     host = company_host,
                                     user = company_user,
@@ -50,12 +56,14 @@ def connect_and_execute_query(company_host,company_user,company_password,company
     company_cursor = mydb.cursor()
     sql_query = read_query(query_action)
     company_cursor.execute(sql_query)
-    if output == True:
-        result = company_cursor.fetchall()
-    out_list=[]
-    for res in result:
-        out_list.append(res)
-    return out_list
+
+    if results == True:
+        result_from_query = company_cursor.fetchall()
+        output_list=[]
+        for res in result_from_query:
+            output_list.append(res)
+        return output_list
+    return
 
 def ask_for_sv_data():
     host = input("Please insert host name (default localhost if using XAMPP): ")
@@ -89,14 +97,14 @@ def import_or_manual_sv_data_gathering():
 
 def invoice_ticket_load():
     print("Welcome to Docs. load to database! Please fill in the fields to load documentation.")
-    user_type_input = input("Please insert Document Type.\n If you would like to see the available options, type 'Options'; otherwise input the Doc. Type: ")
     def options():
-        while user_type_input not in ["FCV", "FCC", "TIV", "TIC", "NCC", "NCV", "NDC", "NDV"] or user_type_input != "Types":
+        user_type_input = input(" Please insert Document Type.\n If you would like to see the available options, type 'Options'; otherwise input the Doc. Type: ")
+        while (user_type_input not in ["FCV", "FCC", "TIV", "TIC", "NCC", "NCV", "NDC", "NDV"]) and (user_type_input != "Options"):
             user_type_input = input("Please insert valid Document Type.\n If you would like to see the available options, type 'Options'; otherwise input the Doc. Type: ")
-        type_options = "\n FCV = Sale doc.\n FCC = Purchase doc.\n TIV = Sale Ticket.\n TIC = Purchase Ticket.\n NCC: Purchase Credit Note.\n NCV: Sale Credit Notes.\n NDC: Purchase Debit Note.\n NDV: Sale Debit Note.\n Answer: "
+        type_options = "\n FCV = Sale doc.\n FCC = Purchase doc.\n TIV = Sale Ticket.\n TIC = Purchase Ticket.\n NCC: Purchase Credit Note.\n NCV: Sale Credit Notes.\n NDC: Purchase Debit Note.\n NDV: Sale Debit Note."
         if user_type_input == "Options":
             print(type_options)
-        if user_input not in ["FCV", "FCC", "TIV", "TIC", "NCC", "NCV", "NDC", "NDV"]:
+        if user_type_input not in ["FCV", "FCC", "TIV", "TIC", "NCC", "NCV", "NDC", "NDV"]:
             options()
         return user_type_input
     user_type_input = options()    
@@ -130,7 +138,7 @@ def operate_on_database(database):
         invoice_ticket_load()
     return
 
-# operate_on_database("coca")
+operate_on_database("coca")
 
 option = input("Hello, Welcome to this Accounting Software! Please enter the number of the action you would like to perform: \n 1- Create New Database. \n 2- Delete an existing Database. \n 3- Operate with an existing Database.\n 4- Close the Program.\n Answer: ")
 
@@ -141,33 +149,33 @@ if option == "1":
     if sv_data_and_db_name[0] == "with env":
         env_data = read_env_file(sv_data_and_db_name[1])
         create_database(env_data[0], env_data[1], env_data[2], f"{sv_data_and_db_name[2]}")
-        connect_and_execute_query(env_data[0], env_data[1], env_data[2], f"{sv_data_and_db_name[2]}", "create_tables")
+        connect_and_execute_query(env_data[0], env_data[1], env_data[2], f"{sv_data_and_db_name[2]}", "create_tables",False)
     else:
         data_list = []
         for data in sv_data_and_db_name[1]:
             data_list.append(data)
         create_database(data_list[0], data_list[1], data_list[2], f"{sv_data_and_db_name[2]}")
-        connect_and_execute_query(data_list[0], data_list[1], data_list[2], f"{sv_data_and_db_name[2]}", "create_tables")
-elif option == "2":
-        try:
-            data = ask_for_sv_data()
-            database_name = input("Please insert Database name: ")
-            delete_database(data[0], data[1], data[2], database_name)
-        except DatabaseError as er:
-            print(er)
-elif option == "4":
-    print("Closing program! Have a nice day.")
-elif option == "3":
-    sv_data_and_db_name=import_or_manual_sv_data_gathering()
-    if sv_data_and_db_name[0] == "with env":
-        env_data = read_env_file(sv_data_and_db_name[1])
-        checking_sv_conn = connect_and_execute_query(env_data[0], env_data[1], env_data[2], f"{sv_data_and_db_name[2]}", "check",True)
-    else:
-        data_list = []
-        for data in sv_data_and_db_name[1]:
-            data_list.append(data)
-        checking_sv_conn = connect_and_execute_query(data_list[0], data_list[1], data_list[2], f"{sv_data_and_db_name[2]}", "check", True)
-    if len(checking_sv_conn)==0:
-        print("Connection Error!")
-    else:
-        operate_on_database(sv_data_and_db_name[2])
+        connect_and_execute_query(data_list[0], data_list[1], data_list[2], f"{sv_data_and_db_name[2]}", "create_tables",False)
+# elif option == "2":
+#         try:
+#             data = ask_for_sv_data()
+#             database_name = input("Please insert Database name: ")
+#             delete_database(data[0], data[1], data[2], database_name)
+#         except DatabaseError as er:
+#             print(er)
+# elif option == "4":
+#     print("Closing program! Have a nice day.")
+# elif option == "3":
+#     sv_data_and_db_name = import_or_manual_sv_data_gathering()
+#     if sv_data_and_db_name[0] == "with env":
+#         env_data = read_env_file(sv_data_and_db_name[1])
+#         checking_sv_conn = connect_and_execute_query(env_data[0], env_data[1], env_data[2], f"{sv_data_and_db_name[2]}", "check",True)
+#     else:
+#         data_list = []
+#         for data in sv_data_and_db_name[1]:
+#             data_list.append(data)
+#         checking_sv_conn = connect_and_execute_query(data_list[0], data_list[1], data_list[2], f"{sv_data_and_db_name[2]}", "check", True)
+#     if len(checking_sv_conn) == 0:
+#         print("Connection Error!")
+#     else:
+#         operate_on_database(sv_data_and_db_name[2])
