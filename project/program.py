@@ -97,7 +97,7 @@ def import_or_manual_sv_data_gathering():
 
 def invoice_ticket_load():
     print("Welcome to Docs. load to database! Please fill in the fields to load documentation.")
-    def options():
+    def type_input():
         user_type_input = input(" Please insert Document Type.\n If you would like to see the available options, type 'Options'; otherwise input the Doc. Type: ")
         while (user_type_input not in ["FCV", "FCC", "TIV", "TIC", "NCC", "NCV", "NDC", "NDV"]) and (user_type_input != "Options"):
             user_type_input = input("Please insert valid Document Type.\n If you would like to see the available options, type 'Options'; otherwise input the Doc. Type: ")
@@ -107,7 +107,7 @@ def invoice_ticket_load():
         if user_type_input not in ["FCV", "FCC", "TIV", "TIC", "NCC", "NCV", "NDC", "NDV"]:
             options()
         return user_type_input
-    user_type_input = options()    
+    user_type_input = type_input()    
     pattern = '%d/%m/%Y'
     date=None
     while date is None:
