@@ -88,10 +88,18 @@ def import_or_manual_sv_data_gathering():
     return
 
 def invoice_ticket_load():
-    print("Welcome to Invoice/Ticket load to database! Please fill in the fields to load documentation.")
-    type_of_doc = input("Please insert Invoice/Ticket type of document. \nAvailable options: \n FCV = Sales doc.;\n  FCC = Buys doc.;\n TIV = Sales Ticket.\n TIC = Buys Ticket.\nAnswer: ")
-    while type_of_doc not in ["FCV", "FCC", "TIC", "TIV"]:
-        type_of_doc = input("Please insert valid Invoice/Ticket type of document. \nAvailable options are: \n FCV = Sales doc.;\n  FCC = Buys doc.;\n TIV = Sales Ticket.\n TIC = Buys Ticket.\nAnswer: ")
+    print("Welcome to Docs. load to database! Please fill in the fields to load documentation.")
+    user_type_input = input("Please insert Document Type.\n If you would like to see the available options, type 'Options'; otherwise input the Doc. Type: ")
+    def options():
+        while user_type_input not in ["FCV", "FCC", "TIV", "TIC", "NCC", "NCV", "NDC", "NDV"] or user_type_input != "Types":
+            user_type_input = input("Please insert valid Document Type.\n If you would like to see the available options, type 'Options'; otherwise input the Doc. Type: ")
+        type_options = "\n FCV = Sale doc.\n FCC = Purchase doc.\n TIV = Sale Ticket.\n TIC = Purchase Ticket.\n NCC: Purchase Credit Note.\n NCV: Sale Credit Notes.\n NDC: Purchase Debit Note.\n NDV: Sale Debit Note.\n Answer: "
+        if user_type_input == "Options":
+            print(type_options)
+        if user_input not in ["FCV", "FCC", "TIV", "TIC", "NCC", "NCV", "NDC", "NDV"]:
+            options()
+        return user_type_input
+    user_type_input = options()    
     pattern = '%d/%m/%Y'
     date=None
     while date is None:
@@ -105,8 +113,6 @@ def invoice_ticket_load():
     inv_tic_number = input("Please insert Invoice/Ticket Number: ")
     vendor_ID = input("Please insert Invoice/Ticket Vendor ID Number")
     type = input("Please insert AFIP Type of Invoice/Ticket: ")
-    # if "01/01/2000" in invoices_tickets_database[Date]:
-    #     return "correct"
     "Tax Base",
     "VAT Tax",
     "VAT Withholdings",
@@ -114,10 +120,10 @@ def invoice_ticket_load():
     "Other Withholdings",
     "Other imports(not Tax Base)",
     "Total Invoice/Ticket Amount"
-    return print("all ok")
+    return
 
 def operate_on_database():
-    option = input("What would you like to do? 1- Load Bills/Invoices/Other Docs. \n 2- other option\n Answer: ")
+    option = input("What action would you like to perform on? 1- Load Bills/Invoices/Other Docs. \n 2- other option\n Answer: ")
     while option not in ["1", "2", "3", "4"]:
         option = input("What would you like to do? 1- Load Bills/Invoices/Other Docs. \n 2- other option")
     if option == "1":
@@ -152,17 +158,17 @@ operate_on_database()
 #             print(er)
 # elif option == "4":
 #     print("Closing program! Have a nice day.")
-# elif option == "3":
-    # sv_data_and_db_name=import_or_manual_sv_data_gathering()
-    # if sv_data_and_db_name[0] == "with env":
-    #     env_data = read_env_file(sv_data_and_db_name[1])
-    #     checking_sv_conn = connect_and_execute_query(env_data[0], env_data[1], env_data[2], f"{sv_data_and_db_name[2]}", "check",True)
-    # else:
-    #     data_list = []
-    #     for data in sv_data_and_db_name[1]:
-    #         data_list.append(data)
-    #     checking_sv_conn = connect_and_execute_query(data_list[0], data_list[1], data_list[2], f"{sv_data_and_db_name[2]}", "check", True)
-    # if len(checking_sv_conn)==0:
-    #     print("Connection Error!")
-    # else:
-    #     operate_on_database()
+elif option == "3":
+    sv_data_and_db_name=import_or_manual_sv_data_gathering()
+    if sv_data_and_db_name[0] == "with env":
+        env_data = read_env_file(sv_data_and_db_name[1])
+        checking_sv_conn = connect_and_execute_query(env_data[0], env_data[1], env_data[2], f"{sv_data_and_db_name[2]}", "check",True)
+    else:
+        data_list = []
+        for data in sv_data_and_db_name[1]:
+            data_list.append(data)
+        checking_sv_conn = connect_and_execute_query(data_list[0], data_list[1], data_list[2], f"{sv_data_and_db_name[2]}", "check", True)
+    if len(checking_sv_conn)==0:
+        print("Connection Error!")
+    else:
+        operate_on_database()
