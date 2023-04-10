@@ -105,7 +105,7 @@ def invoice_ticket_load():
         if user_type_input == "Options":
             print(type_options)
         if user_type_input not in ["FCV", "FCC", "TIV", "TIC", "NCC", "NCV", "NDC", "NDV"]:
-            options()
+            type_input()
         return user_type_input
     user_type_input = type_input()    
     pattern = '%d/%m/%Y'
