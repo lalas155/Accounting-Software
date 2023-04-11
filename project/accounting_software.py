@@ -146,7 +146,7 @@ def invoice_ticket_load():
 def operate_on_database(database):
     option = input(f"What action would you like to perform on database {database}?\n 1- Load Bills/Invoices/Other Docs.\n 2- (Incoming) Other option\n Answer: ")
     while option not in ["1", "2", "3", "4"]:
-        option = input("What would you like to do? 1- Load Bills/Invoices/Other Docs. \n 2- other option")
+        option = input("What would you like to do? 1- Load Bills/Invoices/Other Docs. \n 2- (Incoming) Other option")
     if option == "1":
         invoice_ticket_load()
     return
