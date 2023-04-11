@@ -107,7 +107,7 @@ def invoice_ticket_load():
         if user_type_input not in ["FCV", "FCC", "TIV", "TIC", "NCC", "NCV", "NDC", "NDV"]:
             type_input()
         return user_type_input
-    user_type_input = type_input()    
+    user_type_input = type_input()  
     pattern = '%d/%m/%Y'
     date=None
     while date is None:
@@ -116,8 +116,21 @@ def invoice_ticket_load():
             date = datetime.strptime(user_input, pattern)
         except ValueError:
             print(f"{user_input} is not a valid date!")
-    letter = input("Please insert Invoice/Ticket Letter (A/B/C): ")
-    sale_point = input("Please insert Invoice/Ticket Sale Point Numer: ")
+    doc_letter = None
+    while doc_letter not in ["A", "B", "C"]:
+        doc_letter = input("Please insert Document Letter (A/B/C): ")
+    def sale_point_numb():
+        sale_point = (input("Please insert Document Sale Point Number as they are shown (Max. 5 integer digits): "))
+        try:
+            int(sale_point)
+        except ValueError:
+            return print(f"{sale_point} is not a valid Doc. Sale Number!"), sale_point_numb()
+        while len(sale_point) > 5 or sale_point == "":
+            sale_point = input("Please insert valid Document Sale Point Number as they are shown (Max. 5 integer digits): ")
+        while len(sale_point) < 5:
+            sale_point = "0" + sale_point
+        return sale_point
+    sale_point_number=sale_point_numb()
     inv_tic_number = input("Please insert Invoice/Ticket Number: ")
     vendor_ID = input("Please insert Invoice/Ticket Vendor ID Number")
     type = input("Please insert AFIP Type of Invoice/Ticket: ")
@@ -140,22 +153,23 @@ def operate_on_database(database):
 
 operate_on_database("coca")
 
-option = input("Hello, Welcome to this Accounting Software! Please enter the number of the action you would like to perform: \n 1- Create New Database. \n 2- Delete an existing Database. \n 3- Operate with an existing Database.\n 4- Close the Program.\n Answer: ")
 
-while option not in ["1", "2", "3", "4"]:
-        option = input("Please enter the number of the action you would like to do: \n 1- Create New Database. \n 2- Delete an existing Database. \n 3- Operate with an existing Database.\n 4- Close the Program.\n Answer: ")
-if option == "1":
-    sv_data_and_db_name = import_or_manual_sv_data_gathering()
-    if sv_data_and_db_name[0] == "with env":
-        env_data = read_env_file(sv_data_and_db_name[1])
-        create_database(env_data[0], env_data[1], env_data[2], f"{sv_data_and_db_name[2]}")
-        connect_and_execute_query(env_data[0], env_data[1], env_data[2], f"{sv_data_and_db_name[2]}", "create_tables",False)
-    else:
-        data_list = []
-        for data in sv_data_and_db_name[1]:
-            data_list.append(data)
-        create_database(data_list[0], data_list[1], data_list[2], f"{sv_data_and_db_name[2]}")
-        connect_and_execute_query(data_list[0], data_list[1], data_list[2], f"{sv_data_and_db_name[2]}", "create_tables",False)
+# option = input("Hello, Welcome to this Accounting Software! Please enter the number of the action you would like to perform: \n 1- Create New Database. \n 2- Delete an existing Database. \n 3- Operate with an existing Database.\n 4- Close the Program.\n Answer: ")
+
+# while option not in ["1", "2", "3", "4"]:
+#         option = input("Please enter the number of the action you would like to do: \n 1- Create New Database. \n 2- Delete an existing Database. \n 3- Operate with an existing Database.\n 4- Close the Program.\n Answer: ")
+# if option == "1":
+#     sv_data_and_db_name = import_or_manual_sv_data_gathering()
+#     if sv_data_and_db_name[0] == "with env":
+#         env_data = read_env_file(sv_data_and_db_name[1])
+#         create_database(env_data[0], env_data[1], env_data[2], f"{sv_data_and_db_name[2]}")
+#         connect_and_execute_query(env_data[0], env_data[1], env_data[2], f"{sv_data_and_db_name[2]}", "create_tables",False)
+#     else:
+#         data_list = []
+#         for data in sv_data_and_db_name[1]:
+#             data_list.append(data)
+#         create_database(data_list[0], data_list[1], data_list[2], f"{sv_data_and_db_name[2]}")
+#         connect_and_execute_query(data_list[0], data_list[1], data_list[2], f"{sv_data_and_db_name[2]}", "create_tables",False)
 # elif option == "2":
 #         try:
 #             data = ask_for_sv_data()
@@ -166,16 +180,16 @@ if option == "1":
 # elif option == "4":
 #     print("Closing program! Have a nice day.")
 # elif option == "3":
-#     sv_data_and_db_name = import_or_manual_sv_data_gathering()
-#     if sv_data_and_db_name[0] == "with env":
-#         env_data = read_env_file(sv_data_and_db_name[1])
-#         checking_sv_conn = connect_and_execute_query(env_data[0], env_data[1], env_data[2], f"{sv_data_and_db_name[2]}", "check",True)
-#     else:
-#         data_list = []
-#         for data in sv_data_and_db_name[1]:
-#             data_list.append(data)
-#         checking_sv_conn = connect_and_execute_query(data_list[0], data_list[1], data_list[2], f"{sv_data_and_db_name[2]}", "check", True)
-#     if len(checking_sv_conn) == 0:
-#         print("Connection Error!")
-#     else:
-#         operate_on_database(sv_data_and_db_name[2])
+    # sv_data_and_db_name = import_or_manual_sv_data_gathering()
+    # if sv_data_and_db_name[0] == "with env":
+    #     env_data = read_env_file(sv_data_and_db_name[1])
+    #     checking_sv_conn = connect_and_execute_query(env_data[0], env_data[1], env_data[2], f"{sv_data_and_db_name[2]}", "check",True)
+    # else:
+    #     data_list = []
+    #     for data in sv_data_and_db_name[1]:
+    #         data_list.append(data)
+    #     checking_sv_conn = connect_and_execute_query(data_list[0], data_list[1], data_list[2], f"{sv_data_and_db_name[2]}", "check", True)
+    # if len(checking_sv_conn) == 0:
+    #     print("Connection Error!")
+    # else:
+    #     operate_on_database(sv_data_and_db_name[2])
