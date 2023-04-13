@@ -140,16 +140,11 @@ def load_document_to_database():
     user_document_numb_input = get_correct_number("Document number", 8)
     document_numb = str(user_document_numb_input).zfill(8)
 
-    def vendor_ID_number():
-        vendor_id = input("Please insert Vendor ID. (11 integer digits): ")
-        try:
-            int(vendor_id)
-        except ValueError:
-            return print(f"{vendor_id} is not a valid Vendor ID!"), vendor_ID_number()
-        while len(vendor_id) != 11 or vendor_id == "":
-            vendor_id = input("Please insert valid Vendor ID. (11 integer digits): ")
-        return vendor_id
-    vendor_id = print(vendor_ID_number())
+    vendor_id = get_correct_number("Vendor ID (11 Int Digits)", 11)
+    while len(vendor_id)!=11:
+        print(f"{vendor_id}")
+        vendor_id = get_correct_number("Vendor ID (11 Int Digits)", 11)
+
     afip_type = input("Please insert AFIP Type of Invoice/Ticket: ")
     "Tax Base",
     "VAT Tax",
