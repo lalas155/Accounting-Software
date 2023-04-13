@@ -95,54 +95,51 @@ def import_or_manual_sv_data_gathering():
             return print(er)
     return
 
-def invoice_ticket_load():
+def load_document_to_database():
     print("Welcome to Docs. load to database! Please fill in the fields to load documentation.")
-    # def type_input():
-    #     user_type_input = input(" Please insert Document Type.\n If you would like to see the available options, type 'Options'; otherwise input the Doc. Type: ")
-    #     while (user_type_input not in ["FCV", "FCC", "TIV", "TIC", "NCC", "NCV", "NDC", "NDV"]) and (user_type_input != "Options"):
-    #         user_type_input = input("Please insert valid Document Type.\n If you would like to see the available options, type 'Options'; otherwise input the Doc. Type: ")
-    #     type_options = "\n FCV = Sale doc.\n FCC = Purchase doc.\n TIV = Sale Ticket.\n TIC = Purchase Ticket.\n NCC: Purchase Credit Note.\n NCV: Sale Credit Notes.\n NDC: Purchase Debit Note.\n NDV: Sale Debit Note."
-    #     if user_type_input == "Options":
-    #         print(type_options)
-    #     if user_type_input not in ["FCV", "FCC", "TIV", "TIC", "NCC", "NCV", "NDC", "NDV"]:
-    #         type_input()
-    #     return user_type_input
-    # user_type_input = type_input()  
-    # pattern = '%d/%m/%Y'
-    # date=None
-    # while date is None:
-    #     user_input = input("Please insert Invoice/Ticket Date (Format= DD/MM/YYYY): ")
-    #     try:
-    #         date = datetime.strptime(user_input, pattern)
-    #     except ValueError:
-    #         print(f"{user_input} is not a valid date!")
-    # doc_letter = None
-    # while doc_letter not in ["A", "B", "C"]:
-    #     doc_letter = input("Please insert Document Letter (A/B/C): ")
-    def point_of_sale():
-        doc_POS = (input("Please insert Document Point of Sale Number. (Max. 5 integer digits): "))
+    def type_input():
+        user_type_input = input(" Please insert Document Type.\n If you would like to see the available options, type 'Options'; otherwise input the Doc. Type: ")
+        while (user_type_input not in ["FCV", "FCC", "TIV", "TIC", "NCC", "NCV", "NDC", "NDV"]) and (user_type_input != "Options"):
+            user_type_input = input("Please insert valid Document Type.\n If you would like to see the available options, type 'Options'; otherwise input the Doc. Type: ")
+        type_options = "\n FCV = Sale doc.\n FCC = Purchase doc.\n TIV = Sale Ticket.\n TIC = Purchase Ticket.\n NCC: Purchase Credit Note.\n NCV: Sale Credit Notes.\n NDC: Purchase Debit Note.\n NDV: Sale Debit Note."
+        if user_type_input == "Options":
+            print(type_options)
+        if user_type_input not in ["FCV", "FCC", "TIV", "TIC", "NCC", "NCV", "NDC", "NDV"]:
+            type_input()
+        return user_type_input
+    user_type_input = type_input()
+    print(user_type_input) 
+    pattern = '%d/%m/%Y'
+    date=None
+    while date is None:
+        user_input = input("Please insert Invoice/Ticket Date (Format= DD/MM/YYYY): ")
         try:
-            int(doc_POS)
+            date = datetime.strptime(user_input, pattern)
         except ValueError:
-            return print(f"{doc_POS} is not a valid Doc. Point of Sale Number!"), point_of_sale()
-        while len(doc_POS) > 5 or doc_POS == "":
-            doc_POS = input("Please insert valid Document Point of Sale Number. (Max. 5 integer digits): ")
-        while len(doc_POS) < 5:
-            doc_POS = "0" + doc_POS
-        return doc_POS
-    document_POS = print(point_of_sale())
-    def document_number():
-        doc_numb = input("Please insert Document Number. (Max. 8 integer digits): ")
-        try:
-            int(doc_numb)
-        except ValueError:
-            return print(f"{doc_numb} is not a valid Doc. Number!"), document_number()
-        while len(doc_numb) > 8 or doc_numb == "":
-            doc_numb = input("Please insert valid Document Number. (Max. 8 integer digits): ")
-        while len(doc_numb) < 8:
-            doc_numb = "0" + doc_numb
-        return doc_numb
-    doc_numb = print(document_number())
+            print(f"{user_input} is not a valid date!")
+    doc_letter = None
+    while doc_letter not in ["A", "B", "C", "E", "M"]:
+        doc_letter = input("Please insert Document Letter (A/B/C/E/M): ")
+    def get_correct_number(type_of_number_information,max_digits:int):
+        while True:
+            try:
+                user_input = input(f"Please insert {type_of_number_information}: ")
+                int(user_input)
+            except ValueError:
+                print(f"{user_input} is not a valid {type_of_number_information}!")
+                continue
+            if len(user_input) > max_digits:
+                print(f"{user_input} is not a valid {type_of_number_information}!")
+            else:
+                break
+        return user_input
+    
+    user_point_of_sale_input = get_correct_number("Document Point of Sale number", 5)
+    document_POS = str(user_point_of_sale_input).zfill(5)
+
+    user_document_numb_input = get_correct_number("Document number", 8)
+    document_numb = str(user_document_numb_input).zfill(8)
+
     def vendor_ID_number():
         vendor_id = input("Please insert Vendor ID. (11 integer digits): ")
         try:
@@ -153,7 +150,7 @@ def invoice_ticket_load():
             vendor_id = input("Please insert valid Vendor ID. (11 integer digits): ")
         return vendor_id
     vendor_id = print(vendor_ID_number())
-    type = input("Please insert AFIP Type of Invoice/Ticket: ")
+    afip_type = input("Please insert AFIP Type of Invoice/Ticket: ")
     "Tax Base",
     "VAT Tax",
     "VAT Withholdings",
@@ -168,7 +165,7 @@ def operate_on_database(database):
     while option not in ["1", "2", "3", "4"]:
         option = input("What would you like to do? 1- Load Bills/Invoices/Other Docs. \n 2- (Incoming) Other option")
     if option == "1":
-        invoice_ticket_load()
+        load_document_to_database()
     return
 
 operate_on_database("coca")
