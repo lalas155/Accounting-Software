@@ -4,6 +4,8 @@ import logging
 from dotenv import load_dotenv
 from mysql.connector.errors import DatabaseError
 from datetime import datetime
+import xlrd
+import requests
 
 def read_query(action):
     project_directory = os.path.dirname(os.path.realpath(__file__))
@@ -97,29 +99,29 @@ def import_or_manual_sv_data_gathering():
 
 def load_document_to_database():
     print("Welcome to Docs. load to database! Please fill in the fields to load documentation.")
-    def type_input():
-        user_type_input = input(" Please insert Document Type.\n If you would like to see the available options, type 'Options'; otherwise input the Doc. Type: ")
-        while (user_type_input not in ["FCV", "FCC", "TIV", "TIC", "NCC", "NCV", "NDC", "NDV"]) and (user_type_input != "Options"):
-            user_type_input = input("Please insert valid Document Type.\n If you would like to see the available options, type 'Options'; otherwise input the Doc. Type: ")
-        type_options = "\n FCV = Sale doc.\n FCC = Purchase doc.\n TIV = Sale Ticket.\n TIC = Purchase Ticket.\n NCC: Purchase Credit Note.\n NCV: Sale Credit Notes.\n NDC: Purchase Debit Note.\n NDV: Sale Debit Note."
-        if user_type_input == "Options":
-            print(type_options)
-        if user_type_input not in ["FCV", "FCC", "TIV", "TIC", "NCC", "NCV", "NDC", "NDV"]:
-            type_input()
-        return user_type_input
-    user_type_input = type_input()
-    print(user_type_input) 
-    pattern = '%d/%m/%Y'
-    date=None
-    while date is None:
-        user_input = input("Please insert Invoice/Ticket Date (Format= DD/MM/YYYY): ")
-        try:
-            date = datetime.strptime(user_input, pattern)
-        except ValueError:
-            print(f"{user_input} is not a valid date!")
-    doc_letter = None
-    while doc_letter not in ["A", "B", "C", "E", "M"]:
-        doc_letter = input("Please insert Document Letter (A/B/C/E/M): ")
+    # def type_input():
+    #     user_type_input = input(" Please insert Document Type.\n If you would like to see the available options, type 'Options'; otherwise input the Doc. Type: ")
+    #     while (user_type_input not in ["FCV", "FCC", "TIV", "TIC", "NCC", "NCV", "NDC", "NDV"]) and (user_type_input != "Options"):
+    #         user_type_input = input("Please insert valid Document Type.\n If you would like to see the available options, type 'Options'; otherwise input the Doc. Type: ")
+    #     type_options = "\n FCV = Sale doc.\n FCC = Purchase doc.\n TIV = Sale Ticket.\n TIC = Purchase Ticket.\n NCC: Purchase Credit Note.\n NCV: Sale Credit Notes.\n NDC: Purchase Debit Note.\n NDV: Sale Debit Note."
+    #     if user_type_input == "Options":
+    #         print(type_options)
+    #     if user_type_input not in ["FCV", "FCC", "TIV", "TIC", "NCC", "NCV", "NDC", "NDV"]:
+    #         type_input()
+    #     return user_type_input
+    # user_type_input = type_input()
+    # print(user_type_input) 
+    # pattern = '%d/%m/%Y'
+    # date=None
+    # while date is None:
+    #     user_input = input("Please insert Invoice/Ticket Date (Format= DD/MM/YYYY): ")
+    #     try:
+    #         date = datetime.strptime(user_input, pattern)
+    #     except ValueError:
+    #         print(f"{user_input} is not a valid date!")
+    # doc_letter = None
+    # while doc_letter not in ["A", "B", "C", "E", "M"]:
+    #     doc_letter = input("Please insert Document Letter (A/B/C/E/M): ")
     def get_correct_number(type_of_number_information,max_digits:int):
         while True:
             try:
@@ -134,18 +136,47 @@ def load_document_to_database():
                 break
         return user_input
     
-    user_point_of_sale_input = get_correct_number("Document Point of Sale number", 5)
-    document_POS = str(user_point_of_sale_input).zfill(5)
+    # user_point_of_sale_input = get_correct_number("Document Point of Sale number", 5)
+    # document_POS = str(user_point_of_sale_input).zfill(5)
 
-    user_document_numb_input = get_correct_number("Document number", 8)
-    document_numb = str(user_document_numb_input).zfill(8)
+    # user_document_numb_input = get_correct_number("Document number", 8)
+    # document_numb = str(user_document_numb_input).zfill(8)
 
     vendor_id = get_correct_number("Vendor ID (11 Int Digits)", 11)
-    while len(vendor_id)!=11:
-        print(f"{vendor_id}")
+    while len(vendor_id) != 11:
+        print(f"{vendor_id} is not a valid Vendor ID (11 Int Digits)!")
         vendor_id = get_correct_number("Vendor ID (11 Int Digits)", 11)
-
-    afip_type = input("Please insert AFIP Type of Invoice/Ticket: ")
+        
+    def get_afip_doc_types():
+        project_directory = os.path.dirname(os.path.realpath(__file__))
+        file_name = "/afip_doc_types.xls"
+        if file_name in project_directory:
+            pass
+        else:
+            afip_doc_types_url = "https://www.afip.gob.ar/fe/documentos/TABLACOMPROBANTES.xls"
+            request=requests.get(afip_doc_types_url)
+            open(project_directory+"/afip_doc_types.xls","wb").write(request.content)
+        workbook = xlrd.open_workbook(project_directory+file_name)
+        sheet = workbook.sheet_by_index(0) #getting the first sheet
+        row_count = sheet.nrows
+        col_count = sheet.ncols
+        raw_afip_doc_types = []
+        for cur_row in range(0, row_count):
+            for cur_col in range(0, col_count):
+                cell = sheet.cell(cur_row, cur_col)
+                raw_afip_doc_types.append(cell.value)
+        afip_doc_types = []
+        for type in raw_afip_doc_types:
+            if len(str(type)) == 3:
+                afip_doc_types.append(type)
+            else:
+                continue
+        return afip_doc_types
+    types = get_afip_doc_types()
+    afip_doc_type_input = input("Please insert AFIP Type of Document: ")
+    while afip_doc_type_input not in types:
+        afip_doc_type_input=input("Please insert valid AFIP Type of Document: ")
+        
     "Tax Base",
     "VAT Tax",
     "VAT Withholdings",
@@ -158,7 +189,7 @@ def load_document_to_database():
 def operate_on_database(database):
     option = input(f"What action would you like to perform on database {database}?\n 1- Load Bills/Invoices/Other Docs.\n 2- (Incoming) Other option\n Answer: ")
     while option not in ["1", "2", "3", "4"]:
-        option = input("What would you like to do? 1- Load Bills/Invoices/Other Docs. \n 2- (Incoming) Other option")
+        option = input(f"What action would you like to perform on database {database}?\n 1- Load Bills/Invoices/Other Docs.\n 2- (Incoming) Other option\n Answer: ")
     if option == "1":
         load_document_to_database()
     return
