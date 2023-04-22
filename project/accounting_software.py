@@ -122,16 +122,21 @@ def load_document_to_database():
     # doc_letter = None
     # while doc_letter not in ["A", "B", "C", "E", "M"]:
     #     doc_letter = input("Please insert Document Letter (A/B/C/E/M): ")
-    def get_correct_number(type_of_number_information,max_digits:int):
+    def get_correct_number(information_about_number,max_digits:int):
+        """
+        Information about number: a short description of what kind of information the input you are asking for represents.
+        Asks for an integer input and checks if it is. Keeps asking for it as long as it is not an integer.
+        Finally, checks if the input length is larger than the 'max_digits' available for that number.
+        """
         while True:
             try:
-                user_input = input(f"Please insert {type_of_number_information}: ")
+                user_input = input(f"Please insert {information_about_number}: ")
                 int(user_input)
             except ValueError:
-                print(f"{user_input} is not a valid {type_of_number_information}!")
+                print(f"{user_input} is not a valid {information_about_number}!")
                 continue
             if len(user_input) > max_digits:
-                print(f"{user_input} is not a valid {type_of_number_information}!")
+                print(f"{user_input} is not a valid {information_about_number}!")
             else:
                 break
         return user_input
@@ -176,7 +181,8 @@ def load_document_to_database():
     afip_doc_type_input = input("Please insert AFIP Type of Document: ")
     while afip_doc_type_input not in types:
         afip_doc_type_input=input("Please insert valid AFIP Type of Document: ")
-        
+    
+    
     "Tax Base",
     "VAT Tax",
     "VAT Withholdings",
