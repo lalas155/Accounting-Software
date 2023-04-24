@@ -135,6 +135,7 @@ def load_document_to_database():
             print("4- Number: ",document_information[4])
             print(f"5- {vendor_or_client} ID: ",document_information[5])
             print("6- AFIP Type: ",document_information[6])
+            print("Restart load.")
             option = input("Please insert the number of the information you would like to load: ")
             if option == "1":
                 def type_input():
@@ -173,10 +174,10 @@ def load_document_to_database():
                 document_numb = str(user_document_numb_input).zfill(8)
                 document_information[4] = document_numb
             elif option == "5":
-                vendor_id = get_correct_number("Vendor ID (11 Int Digits)", 11)
-                while len(vendor_id) != 11:
-                    print(f"{vendor_id} is not a valid Vendor ID (11 Int Digits)!")
-                    vendor_id = get_correct_number("Vendor ID (11 Int Digits)", 11)
+                vendor_client_id = get_correct_number(f"{vendor_or_client} ID (11 Int Digits)", 11)
+                while len(vendor_client_id) != 11:
+                    print(f"{vendor_client_id} is not a valid {vendor_or_client} ID (11 Int Digits)!")
+                    vendor_client_id = get_correct_number(f"{vendor_or_client} ID (11 Int Digits)", 11)
             elif option == "6":
                 def get_afip_doc_types():
                     project_directory = os.path.dirname(os.path.realpath(__file__))
@@ -215,30 +216,57 @@ def load_document_to_database():
             document_total_amount = other_amounts_not_tax_base
             document_information.append(other_amounts_not_tax_base)
             document_information.append(document_total_amount)
-            print(f"Your are about to load the following Document:\n {date} {user_type_input} {doc_letter} {document_POS}-{document_numb}\n AFIP Type: {afip_doc_type_input}\n Total Document Amount: {document_total_amount}")
+            print(f"Your are about to load the following Document:\n {date} {user_type_input} {doc_letter} {document_POS}-{document_numb}\n {vendor_or_client} ID: {vendor_client_id}\n AFIP Type: {afip_doc_type_input}\n Total Document Amount: {document_total_amount}")
             final_check = input("Load to database? ('Yes' or 'Restart'): ")
             while final_check != "Yes" or "Restart":
                 final_check = input("Load to database? ('Yes' or 'Restart'): ")
             if final_check == "Restart":
                 return "Restart"
             elif final_check == "Yes":
-                pass
-
-
+                return document_information
         else:
-            tax_base_105 = get_correct_number("the Document 10.5% VAT Base. If not applicable, enter zero.", 99)
-            tax_base_21 = get_correct_number("the Document 21% VAT Base. If not applicable, enter zero.", 99)
-            tax_base_27 = get_correct_number("the Document 27% VAT Base. If not applicable, enter zero.", 99)
-            tax_105 = get_correct_number("the Document 10.5% VAT. If not applicable, enter zero.", 99)
-            tax_21 = get_correct_number("the Document 21% VAT. If not applicable, enter zero.", 99)
-            tax_27 = get_correct_number("the Document 27% VAT. If not applicable, enter zero.", 99)
-            vat_withholdings = get_correct_number("the Document VAT Withholdings. If not applicable, enter zero.", 99)
+            document_amounts = ["","","","","","","","","",""]
+            print("0- VAT Base 10.5%: ",document_amounts[0])
+            print("1- VAT Base 21%: ",document_amounts[1])
+            print("2- VAT Base 27%: ",document_amounts[2])
+            print("3- VAT 10.5%: ",document_amounts[3])
+            print("4- VAT 21%: ",document_amounts[4])
+            print("5- VAT 27%: ",document_amounts[5])
+            print("6- VAT Withholdings: ",document_amounts[6])
+            print("7- Gross Income Withholdings: ",document_amounts[7])
+            print("8- Other Withholdings: ",document_amounts[8])
+            print("9- Other Amounts: ",document_amounts[9])
+            print("Total Amount: ",document_amounts[10])
+            option = input("Please insert the number of the information you would like to load: ")
+            if option == "0":
+                tax_base_105 = get_correct_number("the Document 10.5% VAT Base. If not applicable, enter zero.", 99)
+                document_amounts[0] = tax_base_105
+            elif option == "1":
+                tax_base_21 = get_correct_number("the Document 21% VAT Base. If not applicable, enter zero.", 99)
+                document_amounts[1] = tax_base_21
+            elif option == "2":
+                tax_base_27 = get_correct_number("the Document 27% VAT Base. If not applicable, enter zero.", 99)
+                document_amounts[2] = tax_base_27
+            elif option == "3"_
+                vat_105 = get_correct_number("the Document 10.5% VAT. If not applicable, enter zero.", 99)
+                document_amounts[3] = vat_105
+            elif option == "4":
+                vat_21 = get_correct_number("the Document 21% VAT. If not applicable, enter zero.", 99)
+                document_amounts[4] = vat_21
+            elif option == "5":
+                vat_27 = get_correct_number("the Document 27% VAT. If not applicable, enter zero.", 99)
+                document_amounts[5] = vat_27
+            elif option == "6":
+                vat_withholdings = get_correct_number("the Document VAT Withholdings. If not applicable, enter zero.", 99)
+                document_amounts[6] = vat_withholdings
+            
             gross_income_withholdings = get_correct_number("the Document Gross Income Withholdings. If not applicable, enter zero.", 99)
             other_withholdings = get_correct_number("the Document other Withholdings. If not applicable, enter zero.", 99)
             other_amounts_not_tax_base = get_correct_number("the Document other amounts that do not match any of the criteria asked above.", 99)
-            document_total_amount = tax_base_105 + tax_base_21 + tax_base_27 + tax_105 + tax_21 + tax_27 + vat_withholdings + gross_income_withholdings + other_withholdings + other_amounts_not_tax_base
+            document_total_amount = tax_base_105 + tax_base_21 + tax_base_27 + vat_105 + vat_21 + vat_27 + vat_withholdings + gross_income_withholdings + other_withholdings + other_amounts_not_tax_base
+            document_amounts.append(document_total_amount)
             
-            final_check = print(f"Your are about to load the following Document:\n {date} {user_type_input} {doc_letter} {document_POS}-{document_numb}\n AFIP Type: {afip_doc_type_input}\n VAT Base 10.5: {tax_base_105}    VAT 10.5: {tax_105}\n VAT Base 21:{tax_base_21}    VAT 21:{tax_21}\n VAT Base 27: {tax_base_27}    VAT 27: {tax_27}\n VAT Withholdings: {vat_withholdings}\n Gross Income Withholdings: {gross_income_withholdings}\n Other amounts: {other_amounts_not_tax_base}\n Total Document Amount: {document_total_amount}")
+            final_check = print(f"Your are about to load the following Document:\n {date} {user_type_input} {doc_letter} {document_POS}-{document_numb}\n AFIP Type: {afip_doc_type_input}\n VAT Base 10.5: {tax_base_105}    VAT 10.5: {vat_105}\n VAT Base 21:{tax_base_21}    VAT 21:{vat_21}\n VAT Base 27: {tax_base_27}    VAT 27: {vat_27}\n VAT Withholdings: {vat_withholdings}\n Gross Income Withholdings: {gross_income_withholdings}\n Other amounts: {other_amounts_not_tax_base}\n Total Document Amount: {document_total_amount}")
 
         return
 
