@@ -122,94 +122,94 @@ def load_document_to_database():
     document_information = ["", "", "", "", "", "", ""]
     loading = True
     while loading:
-        # while "" in document_information:
-        #     vendor_or_client = "Vendor/Client"
-        #     if document_information[1] in ["FCV","TIV","NCV","NDV"]:
-        #         vendor_or_client = "Client"
-        #     elif document_information[1] in ["FCC","TIC","NCC","NDC"]:
-        #         vendor_or_client = "Vendor"
-        #     print("0- Date: ",document_information[0])
-        #     print("1- Type: ",document_information[1])
-        #     print("2- Letter: ",document_information[2])
-        #     print("3- PoS: ",document_information[3])
-        #     print("4- Number: ",document_information[4])
-        #     print(f"5- {vendor_or_client} ID: ",document_information[5])
-        #     print("6- AFIP Type: ",document_information[6])
-        #     print("7- Restart load.")
-        #     option = input("Please insert the number of the information you would like to load: ")
-        #     if option == "1":
-        #         def type_input():
-        #             user_type_input = input(" Please insert Document Type.\n If you would like to see the available options, type 'Options'; otherwise input the Doc. Type: ")
-        #             while (user_type_input not in ["FCV", "FCC", "TIV", "TIC", "NCC", "NCV", "NDC", "NDV"]) and (user_type_input != "Options"):
-        #                 user_type_input = input("Please insert valid Document Type.\n If you would like to see the available options, type 'Options'; otherwise input the Doc. Type: ")
-        #             type_options = "\n FCV = Sale doc.\n FCC = Purchase doc.\n TIV = Sale Ticket.\n TIC = Purchase Ticket.\n NCC: Purchase Credit Note.\n NCV: Sale Credit Notes.\n NDC: Purchase Debit Note.\n NDV: Sale Debit Note."
-        #             if user_type_input == "Options":
-        #                 print(type_options)
-        #             if user_type_input not in ["FCV", "FCC", "TIV", "TIC", "NCC", "NCV", "NDC", "NDV"]:
-        #                 type_input()
-        #             return user_type_input
-        #         user_type_input = type_input()
-        #         document_information[1] = user_type_input
-        #     elif option == "2":
-        #         doc_letter = None
-        #         while doc_letter not in ["A", "B", "C", "E", "M"]:
-        #             doc_letter = input("Please insert Document Letter (A/B/C/E/M): ")
-        #         document_information[2] = doc_letter
-        #     elif option == "0":
-        #         pattern = '%d/%m/%Y'
-        #         date = None
-        #         while date is None:
-        #             user_input = input("Please insert Document Date (Format= DD/MM/YYYY): ")
-        #             try:
-        #                 date = datetime.strptime(user_input, pattern).date()
-        #             except ValueError:
-        #                 print(f"{user_input} is not a valid date!")
-        #         document_information[0] = datetime.strftime(date, pattern)
-        #     elif option == "3":
-        #         user_point_of_sale_input = get_correct_number("Document Point of Sale number", 5)
-        #         document_POS = str(user_point_of_sale_input).zfill(5)
-        #         document_information[3] = document_POS
-        #     elif option == "4":
-        #         user_document_numb_input = get_correct_number("Document number", 8)
-        #         document_numb = str(user_document_numb_input).zfill(8)
-        #         document_information[4] = document_numb
-        #     elif option == "5":
-        #         vendor_client_id = get_correct_number(f"{vendor_or_client} ID (11 Int Digits)", 11)
-        #         while len(vendor_client_id) != 11:
-        #             print(f"{vendor_client_id} is not a valid {vendor_or_client} ID (11 Int Digits)!")
-        #             vendor_client_id = get_correct_number(f"{vendor_or_client} ID (11 Int Digits)", 11)
-        #         document_information[5] = vendor_client_id
-        #     elif option == "6":
-        #         def get_afip_doc_types(afip_type):
-        #             project_directory = os.path.dirname(os.path.realpath(__file__))
-        #             file_name = "/afip_doc_types.xls"
-        #             if file_name in project_directory:
-        #                 pass
-        #             else:
-        #                 afip_doc_types_url = "https://www.afip.gob.ar/fe/documentos/TABLACOMPROBANTES.xls"
-        #                 request=requests.get(afip_doc_types_url)
-        #                 open(project_directory+"/afip_doc_types.xls","wb").write(request.content)
-        #             workbook = xlrd.open_workbook(project_directory+file_name)
-        #             sheet = workbook.sheet_by_index(0)
-        #             row_count = sheet.nrows
-        #             col_count = sheet.ncols
-        #             raw_afip_doc_types = []
-        #             for cur_row in range(0, row_count):
-        #                 for cur_col in range(0, col_count):
-        #                     cell = sheet.cell(cur_row, cur_col)
-        #                     raw_afip_doc_types.append(cell.value)
-        #             if afip_type in raw_afip_doc_types:
-        #                 return raw_afip_doc_types[raw_afip_doc_types.index(afip_type)+1]
-        #             else:
-        #                 return "Wrong"
-        #         afip_doc_type_input = input("Please insert AFIP Type of Document: ")
-        #         afip_doc_type = get_afip_doc_types(afip_doc_type_input)
-        #         while afip_doc_type == "Wrong":
-        #             afip_doc_type_input = input("Please insert valid AFIP Type of Document: ")
-        #             afip_doc_type = get_afip_doc_types(afip_doc_type_input)
-        #         document_information[6] = afip_doc_type
-        #     elif option == "7":
-        #         return "Restart"
+        while "" in document_information:
+            vendor_or_client = "Vendor/Client"
+            if document_information[1] in ["FCV","TIV","NCV","NDV"]:
+                vendor_or_client = "Client"
+            elif document_information[1] in ["FCC","TIC","NCC","NDC"]:
+                vendor_or_client = "Vendor"
+            print("0- Date: ",document_information[0])
+            print("1- Type: ",document_information[1])
+            print("2- Letter: ",document_information[2])
+            print("3- PoS: ",document_information[3])
+            print("4- Number: ",document_information[4])
+            print(f"5- {vendor_or_client} ID: ",document_information[5])
+            print("6- AFIP Type: ",document_information[6])
+            print("7- Restart load.")
+            option = input("Please insert the number of the information you would like to load: ")
+            if option == "1":
+                def type_input():
+                    user_type_input = input(" Please insert Document Type.\n If you would like to see the available options, type 'Options'; otherwise input the Doc. Type: ")
+                    while (user_type_input not in ["FCV", "FCC", "TIV", "TIC", "NCC", "NCV", "NDC", "NDV"]) and (user_type_input != "Options"):
+                        user_type_input = input("Please insert valid Document Type.\n If you would like to see the available options, type 'Options'; otherwise input the Doc. Type: ")
+                    type_options = "\n FCV = Sale doc.\n FCC = Purchase doc.\n TIV = Sale Ticket.\n TIC = Purchase Ticket.\n NCC: Purchase Credit Note.\n NCV: Sale Credit Notes.\n NDC: Purchase Debit Note.\n NDV: Sale Debit Note."
+                    if user_type_input == "Options":
+                        print(type_options)
+                    if user_type_input not in ["FCV", "FCC", "TIV", "TIC", "NCC", "NCV", "NDC", "NDV"]:
+                        type_input()
+                    return user_type_input
+                user_type_input = type_input()
+                document_information[1] = user_type_input
+            elif option == "2":
+                doc_letter = None
+                while doc_letter not in ["A", "B", "C", "E", "M"]:
+                    doc_letter = input("Please insert Document Letter (A/B/C/E/M): ")
+                document_information[2] = doc_letter
+            elif option == "0":
+                pattern = '%d/%m/%Y'
+                date = None
+                while date is None:
+                    user_input = input("Please insert Document Date (Format= DD/MM/YYYY): ")
+                    try:
+                        date = datetime.strptime(user_input, pattern).date()
+                    except ValueError:
+                        print(f"{user_input} is not a valid date!")
+                document_information[0] = datetime.strftime(date, pattern)
+            elif option == "3":
+                user_point_of_sale_input = get_correct_number("Document Point of Sale number", 5)
+                document_POS = str(user_point_of_sale_input).zfill(5)
+                document_information[3] = document_POS
+            elif option == "4":
+                user_document_numb_input = get_correct_number("Document number", 8)
+                document_numb = str(user_document_numb_input).zfill(8)
+                document_information[4] = document_numb
+            elif option == "5":
+                vendor_client_id = get_correct_number(f"{vendor_or_client} ID (11 Int Digits)", 11)
+                while len(vendor_client_id) != 11:
+                    print(f"{vendor_client_id} is not a valid {vendor_or_client} ID (11 Int Digits)!")
+                    vendor_client_id = get_correct_number(f"{vendor_or_client} ID (11 Int Digits)", 11)
+                document_information[5] = vendor_client_id
+            elif option == "6":
+                def get_afip_doc_types(afip_type):
+                    project_directory = os.path.dirname(os.path.realpath(__file__))
+                    file_name = "/afip_doc_types.xls"
+                    if file_name in project_directory:
+                        pass
+                    else:
+                        afip_doc_types_url = "https://www.afip.gob.ar/fe/documentos/TABLACOMPROBANTES.xls"
+                        request=requests.get(afip_doc_types_url)
+                        open(project_directory+"/afip_doc_types.xls","wb").write(request.content)
+                    workbook = xlrd.open_workbook(project_directory+file_name)
+                    sheet = workbook.sheet_by_index(0)
+                    row_count = sheet.nrows
+                    col_count = sheet.ncols
+                    raw_afip_doc_types = []
+                    for cur_row in range(0, row_count):
+                        for cur_col in range(0, col_count):
+                            cell = sheet.cell(cur_row, cur_col)
+                            raw_afip_doc_types.append(cell.value)
+                    if afip_type in raw_afip_doc_types:
+                        return raw_afip_doc_types[raw_afip_doc_types.index(afip_type)+1]
+                    else:
+                        return "Wrong"
+                afip_doc_type_input = input("Please insert AFIP Type of Document: ")
+                afip_doc_type = get_afip_doc_types(afip_doc_type_input)
+                while afip_doc_type == "Wrong":
+                    afip_doc_type_input = input("Please insert valid AFIP Type of Document: ")
+                    afip_doc_type = get_afip_doc_types(afip_doc_type_input)
+                document_information[6] = afip_doc_type
+            elif option == "7":
+                return "Restart"
         if document_information[2] in ("B", "C", "E"):
             other_amounts_not_tax_base = get_correct_number("the total amount of the Document.", 99)
             document_total_amount = other_amounts_not_tax_base
@@ -227,7 +227,7 @@ def load_document_to_database():
             keep_loading = True
             document_amounts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
             while keep_loading:
-                document_total_amount = document_amounts[10]
+                document_total_amount = 0
                 for i in range(0, len(document_amounts)-1):
                     document_total_amount += document_amounts[i]
                 document_amounts[10] = document_total_amount
@@ -247,10 +247,10 @@ def load_document_to_database():
                 option = input("Please insert the number of the information you would like to load: ")
                 if option == "0":
                     tax_base_105 = get_correct_number("the Document 10.5% VAT Base.", 99)
-                    document_amounts[0] = tax_base_105
+                    document_amounts[0] = int(tax_base_105)
                 elif option == "1":
                     tax_base_21 = get_correct_number("the Document 21% VAT Base.", 99)
-                    document_amounts[1] = tax_base_21
+                    document_amounts[1] = int(tax_base_21)
                 elif option == "2":
                     tax_base_27 = get_correct_number("the Document 27% VAT Base.", 99)
                     document_amounts[2] = int(tax_base_27)
