@@ -245,14 +245,14 @@ def load_document_to_database():
                 print("11- Restart load.")
                 option = input("Please insert the number of the information you would like to load: ")
                 if option == "0":
-                    tax_base_105 = get_correct_number("the Document 10.5% VAT Base.", 99)
-                    document_amounts[0] = int(tax_base_105)
+                    vat_base_105 = get_correct_number("the Document 10.5% VAT Base.", 99)
+                    document_amounts[0] = int(vat_base_105)
                 elif option == "1":
-                    tax_base_21 = get_correct_number("the Document 21% VAT Base.", 99)
-                    document_amounts[1] = int(tax_base_21)
+                    vat_base_21 = get_correct_number("the Document 21% VAT Base.", 99)
+                    document_amounts[1] = int(vat_base_21)
                 elif option == "2":
-                    tax_base_27 = get_correct_number("the Document 27% VAT Base.", 99)
-                    document_amounts[2] = int(tax_base_27)
+                    vat_base_27 = get_correct_number("the Document 27% VAT Base.", 99)
+                    document_amounts[2] = int(vat_base_27)
                 elif option == "3":
                     vat_105 = get_correct_number("the Document 10.5% VAT.", 99)
                     document_amounts[3] = int(vat_105)
@@ -275,7 +275,7 @@ def load_document_to_database():
                     other_amounts_not_tax_base = get_correct_number("the Document other amounts that do not match any of the criteria asked above.", 99)
                     document_amounts[9] = int(other_amounts_not_tax_base)
                 elif option == "10":
-                    print(f"Your are about to load the following Document:\n {doc_date} - {user_type_input} - {doc_letter} - {document_POS}-{document_numb}\n {vendor_or_client}: {vendor_client_id}\n AFIP Type: {afip_doc_type_input}\n VAT Base 10.5: {tax_base_105}    VAT 10.5: {vat_105}\n VAT Base 21:{tax_base_21}    VAT 21:{vat_21}\n VAT Base 27: {tax_base_27}    VAT 27: {vat_27}\n VAT Withholdings: {vat_withholdings}\n Gross Income Withholdings: {gross_income_withholdings}\n Other amounts: {other_amounts_not_tax_base}\n Total Document Amount: {document_total_amount}")
+                    print(f"Your are about to load the following Document:\n {doc_date} - {user_type_input} - {doc_letter} - {document_POS}-{document_numb}\n {vendor_or_client}: {vendor_client_id}\n AFIP Type: {afip_doc_type_input}\n VAT Base 10.5: {vat_base_105}    VAT 10.5: {vat_105}\n VAT Base 21:{vat_base_21}    VAT 21:{vat_21}\n VAT Base 27: {vat_base_27}    VAT 27: {vat_27}\n VAT Withholdings: {vat_withholdings}\n Gross Income Withholdings: {gross_income_withholdings}\n Other amounts: {other_amounts_not_tax_base}\n Total Document Amount: {document_total_amount}")
                     final_check = input("Are you sure? ('Yes' or 'Restart')")
                     while final_check != "Yes" or "Restart":
                         final_check = input("Load to database? ('Yes' or 'Restart'): ")
