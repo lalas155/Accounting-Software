@@ -46,7 +46,7 @@ def connect_and_execute_query(company_host,company_user,company_password,company
 
     """
     This function will attempt to connect to MySQL database using company host, user, password and database name as inputs.\n 
-    After that, it will execute a MySQL query which name has the format 'query_that_query_file_will_perform.sql'. If 'results' is ser to 'True', results from query, if there is any, will be returned as a list.
+    After that, it will execute a MySQL query which name has the format 'query_that_query_file_will_perform.sql'. If 'results' is set to 'True', results from query, if there is any, will be returned as a list.
     """
 
     mydb = mysql.connector.connect(
@@ -65,7 +65,6 @@ def connect_and_execute_query(company_host,company_user,company_password,company
         for res in result_from_query:
             output_list.append(res)
         return output_list
-    return
 
 def ask_for_sv_data():
     host = input("Please insert host name (default localhost if using XAMPP): ")
@@ -157,14 +156,14 @@ def load_document_to_database():
                 document_information[2] = doc_letter
             elif option == "0":
                 pattern = '%d/%m/%Y'
-                date = None
-                while date is None:
+                doc_date = None
+                while doc_date is None:
                     user_input = input("Please insert Document Date (Format= DD/MM/YYYY): ")
                     try:
-                        date = datetime.strptime(user_input, pattern).date()
+                        doc_date = datetime.strptime(user_input, pattern).date()
                     except ValueError:
                         print(f"{user_input} is not a valid date!")
-                document_information[0] = datetime.strftime(date, pattern)
+                document_information[0] = datetime.strftime(doc_date, pattern)
             elif option == "3":
                 user_point_of_sale_input = get_correct_number("Document Point of Sale number", 5)
                 document_POS = str(user_point_of_sale_input).zfill(5)
@@ -215,7 +214,7 @@ def load_document_to_database():
             document_total_amount = other_amounts_not_tax_base
             document_information.append(other_amounts_not_tax_base)
             document_information.append(document_total_amount)
-            print(f"Your are about to load the following Document:\n {date} {user_type_input} {doc_letter} {document_POS}-{document_numb}\n {vendor_or_client} ID: {vendor_client_id}\n AFIP Type: {afip_doc_type_input}\n Total Document Amount: {document_total_amount}")
+            print(f"Your are about to load the following Document:\n {doc_date} {user_type_input} {doc_letter} {document_POS}-{document_numb}\n {vendor_or_client} ID: {vendor_client_id}\n AFIP Type: {afip_doc_type_input}\n Total Document Amount: {document_total_amount}")
             final_check = input("Load to database? ('Yes' or 'Restart'): ")
             while final_check != "Yes" or "Restart":
                 final_check = input("Load to database? ('Yes' or 'Restart'): ")
@@ -228,7 +227,7 @@ def load_document_to_database():
             document_amounts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
             while keep_loading:
                 document_total_amount = 0
-                for i in range(0, len(document_amounts)-1):
+                for i in range(0, len(document_amounts) - 1):
                     document_total_amount += document_amounts[i]
                 document_amounts[10] = document_total_amount
                 print("0- VAT Base 10.5%: ",document_amounts[0])
@@ -276,18 +275,23 @@ def load_document_to_database():
                     other_amounts_not_tax_base = get_correct_number("the Document other amounts that do not match any of the criteria asked above.", 99)
                     document_amounts[9] = int(other_amounts_not_tax_base)
                 elif option == "10":
-                    print(f"Your are about to load the following Document:\n {date} - {user_type_input} - {doc_letter} - {document_POS}-{document_numb}\n {vendor_or_client}: {vendor_client_id}\n AFIP Type: {afip_doc_type_input}\n VAT Base 10.5: {tax_base_105}    VAT 10.5: {vat_105}\n VAT Base 21:{tax_base_21}    VAT 21:{vat_21}\n VAT Base 27: {tax_base_27}    VAT 27: {vat_27}\n VAT Withholdings: {vat_withholdings}\n Gross Income Withholdings: {gross_income_withholdings}\n Other amounts: {other_amounts_not_tax_base}\n Total Document Amount: {document_total_amount}")
+                    print(f"Your are about to load the following Document:\n {doc_date} - {user_type_input} - {doc_letter} - {document_POS}-{document_numb}\n {vendor_or_client}: {vendor_client_id}\n AFIP Type: {afip_doc_type_input}\n VAT Base 10.5: {tax_base_105}    VAT 10.5: {vat_105}\n VAT Base 21:{tax_base_21}    VAT 21:{vat_21}\n VAT Base 27: {tax_base_27}    VAT 27: {vat_27}\n VAT Withholdings: {vat_withholdings}\n Gross Income Withholdings: {gross_income_withholdings}\n Other amounts: {other_amounts_not_tax_base}\n Total Document Amount: {document_total_amount}")
                     final_check = input("Are you sure? ('Yes' or 'Restart')")
                     while final_check != "Yes" or "Restart":
                         final_check = input("Load to database? ('Yes' or 'Restart'): ")
                     if final_check == "Restart":
                         return "Restart"
                     elif final_check == "Yes":
-                        return document_information
+                        break
                 elif option == "11":
                     return "Restart"
-
-        return
+    document = []
+    document.append(vendor_or_client)
+    for information in document_information:
+        document.append(information)
+    for amounts in document_amounts:
+        document.append(amounts)
+    return document
 
 def operate_on_database(database):
     option = input(f"What action would you like to perform on database {database}?\n 1- Load Bills/Invoices/Other Docs.\n 2- (Incoming) Other option\n Answer: ")
