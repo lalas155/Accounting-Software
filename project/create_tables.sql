@@ -21,14 +21,14 @@ CREATE TABLE IF NOT EXISTS general_journal(
 );
 
 CREATE TABLE IF NOT EXISTS buys_bills_invoices_docs(
-    type_of_document VARCHAR(3) NOT NULL,
-    document_letter VARCHAR(1) NOT NULL,
-    sale_point INT(5) NOT NULL,
-    document_number INT(8) NOT NULL,
-    operation_date VARCHAR(10) NOT NULL,
+    user_type_input VARCHAR(3) NOT NULL,
+    doc_letter VARCHAR(1) NOT NULL,
+    document_POS INT(5) NOT NULL,
+    document_numb INT(8) NOT NULL,
+    doc_date VARCHAR(10) NOT NULL,
     vendor_id VARCHAR(11) NOT NULL,
     vendor_name VARCHAR(50) NOT NULL,
-    afip_type_of_doc VARCHAR(3) NOT NULL,
+    afip_doc_type VARCHAR(3) NOT NULL,
     vat_base_10.5 INT(40),
     vat_base_21 INT(40),
     vat_base_27 INT(40),
@@ -44,11 +44,11 @@ CREATE TABLE IF NOT EXISTS buys_bills_invoices_docs(
 );
 
 CREATE TABLE IF NOT EXISTS sales_bills_invoices_docs(
-    type_of_document VARCHAR(3) NOT NULL,
-    document_letter VARCHAR(1) NOT NULL,
-    sale_point INT(5) NOT NULL,
-    document_number INT(8) NOT NULL,
-    operation_date VARCHAR(10) NOT NULL,
+    user_type_input VARCHAR(3) NOT NULL,
+    doc_letter VARCHAR(1) NOT NULL,
+    document_POS INT(5) NOT NULL,
+    document_numb INT(8) NOT NULL,
+    doc_date VARCHAR(10) NOT NULL,
     client_id VARCHAR(11) NOT NULL,
     client_name VARCHAR(50) NOT NULL,
     afip_type_of_doc VARCHAR(3) NOT NULL,
