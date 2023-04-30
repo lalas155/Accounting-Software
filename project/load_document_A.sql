@@ -1,0 +1,2 @@
+INSERT INTO vendors/clientes VALUES
+(user_type_input, doc_letter, document_POS, document_numb, doc_date, vendor_client_id, , afip_doc_type, vat_base_105, vat_base_21, vat_base_27, vat_105, vat_21, vat_27, vat_withholdings, gross_income_withholdings, other_withholdings, other_amounts_not_tax_base, document_total_amount)
