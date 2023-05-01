@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS general_journal(
     credits INT(11) DEFAULT 0
 );
 
-CREATE TABLE IF NOT EXISTS buys_bills_invoices_docs(
+CREATE TABLE IF NOT EXISTS purchase_docs(
     user_type_input VARCHAR(3) NOT NULL,
     doc_letter VARCHAR(1) NOT NULL,
     document_POS INT(5) NOT NULL,
@@ -39,11 +39,11 @@ CREATE TABLE IF NOT EXISTS buys_bills_invoices_docs(
     gross_income_withholdings INT(40),
     other_withholdings INT(40),
     other_amounts_not_vat_Base INT(40),
-    total_invoice_ticket_amount INT(40),
+    total_document_amount INT(40),
     FOREIGN KEY (vendor_id) REFERENCES vendors(vendor_id)
 );
 
-CREATE TABLE IF NOT EXISTS sales_bills_invoices_docs(
+CREATE TABLE IF NOT EXISTS sales_docs(
     user_type_input VARCHAR(3) NOT NULL,
     doc_letter VARCHAR(1) NOT NULL,
     document_POS INT(5) NOT NULL,
@@ -58,6 +58,6 @@ CREATE TABLE IF NOT EXISTS sales_bills_invoices_docs(
     gross_income_withholdings INT(40),
     other_withholdings INT(40),
     other_amounts_not_vat_Base INT(40),
-    total_invoice_ticket_amount INT(40),
+    total_document_amount INT(40),
     FOREIGN KEY (client_id) REFERENCES clients(client_id)
 );
