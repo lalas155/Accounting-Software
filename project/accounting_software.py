@@ -345,50 +345,47 @@ def operate_on_database(server_data,database_name):
             while answer == "Restart":
                 answer = load_document_to_database(server_data,database_name)
 
-db = ["localhost", "root", ""]
-operate_on_database(db ,"coca")
 
 
-# option = input("Hello, Welcome to this Accounting Software! Please enter the number of the action you would like to perform: \n 1- Create New Database. \n 2- Delete an existing Database. \n 3- Operate with an existing Database.\n 4- Close the Program.\n Answer: ")
 
-# while option not in ["1", "2", "3", "4"]:
-#         option = input("Please enter the number of the action you would like to do: \n 1- Create New Database. \n 2- Delete an existing Database. \n 3- Operate with an existing Database.\n 4- Close the Program.\n Answer: ")
-# if option == "1":
-#     sv_data_and_db_name = import_or_manual_sv_data_gathering()
-#     if sv_data_and_db_name[0] == "with env":
-#         env_data = read_env_file(sv_data_and_db_name[1])
-#         create_database(env_data[0], env_data[1], env_data[2], f"{sv_data_and_db_name[2]}")
-#         connect_and_execute_query(env_data[0], env_data[1], env_data[2], f"{sv_data_and_db_name[2]}", "create_tables",False)
-#     else:
-#         data_list = []
-#         for data in sv_data_and_db_name[1]:
-#             data_list.append(data)
-#         create_database(data_list[0], data_list[1], data_list[2], f"{sv_data_and_db_name[2]}")
-#         connect_and_execute_query(data_list[0], data_list[1], data_list[2], f"{sv_data_and_db_name[2]}", "create_tables",False)
-# elif option == "2":
-#         try:
-#             data = ask_for_sv_data()
-#             database_name = input("Please insert Database name: ")
-#             delete_database(data[0], data[1], data[2], database_name)
-#         except DatabaseError as er:
-#             print(er)
-# elif option == "4":
-#     print("Closing program! Have a nice day.")
-# elif option == "3":
-#     env_or_manual_and_db_name = import_or_manual_sv_data_gathering()
-#     server_data = []
-#     if env_or_manual_and_db_name[0] == "with env":
-#         env_data = read_env_file(env_or_manual_and_db_name[1])
-#         checking_sv_conn = connect_and_execute_query(env_data[0], env_data[1], env_data[2], f"{env_or_manual_and_db_name[2]}", "check",True)
-#         for data in env_data:
-#             server_data.append(data)
-#     elif env_or_manual_and_db_name[0] == "without env":
-#         for data in env_or_manual_and_db_name[1]:
-#             server_data.append(data)
-#         checking_sv_conn = connect_and_execute_query(server_data[0], server_data[1], server_data[2], f"{env_or_manual_and_db_name[2]}", "check", True)
-#     if len(checking_sv_conn) == 0:
-#         print("Connection Error!")
-#     else:
-#         operate_on_database(server_data,env_or_manual_and_db_name[2])
+option = input("Hello, Welcome to this Accounting Software! Please enter the number of the action you would like to perform: \n 1- Create New Database. \n 2- Delete an existing Database. \n 3- Operate with an existing Database.\n 4- Close the Program.\n Answer: ")
 
-# ""
+while option not in ["1", "2", "3", "4"]:
+        option = input("Please enter the number of the action you would like to do: \n 1- Create New Database. \n 2- Delete an existing Database. \n 3- Operate with an existing Database.\n 4- Close the Program.\n Answer: ")
+if option == "1":
+    sv_data_and_db_name = import_or_manual_sv_data_gathering()
+    if sv_data_and_db_name[0] == "with env":
+        env_data = read_env_file(sv_data_and_db_name[1])
+        create_database(env_data[0], env_data[1], env_data[2], f"{sv_data_and_db_name[2]}")
+        connect_and_execute_query(env_data[0], env_data[1], env_data[2], f"{sv_data_and_db_name[2]}", "create_tables",False)
+    else:
+        data_list = []
+        for data in sv_data_and_db_name[1]:
+            data_list.append(data)
+        create_database(data_list[0], data_list[1], data_list[2], f"{sv_data_and_db_name[2]}")
+        connect_and_execute_query(data_list[0], data_list[1], data_list[2], f"{sv_data_and_db_name[2]}", "create_tables",False)
+elif option == "2":
+        try:
+            data = ask_for_sv_data()
+            database_name = input("Please insert Database name: ")
+            delete_database(data[0], data[1], data[2], database_name)
+        except DatabaseError as er:
+            print(er)
+elif option == "4":
+    print("Closing program! Have a nice day.")
+elif option == "3":
+    env_or_manual_and_db_name = import_or_manual_sv_data_gathering()
+    server_data = []
+    if env_or_manual_and_db_name[0] == "with env":
+        env_data = read_env_file(env_or_manual_and_db_name[1])
+        checking_sv_conn = connect_and_execute_query(env_data[0], env_data[1], env_data[2], f"{env_or_manual_and_db_name[2]}", "check",True)
+        for data in env_data:
+            server_data.append(data)
+    elif env_or_manual_and_db_name[0] == "without env":
+        for data in env_or_manual_and_db_name[1]:
+            server_data.append(data)
+        checking_sv_conn = connect_and_execute_query(server_data[0], server_data[1], server_data[2], f"{env_or_manual_and_db_name[2]}", "check", True)
+    if len(checking_sv_conn) == 0:
+        print("Connection Error!")
+    else:
+        operate_on_database(server_data,env_or_manual_and_db_name[2])
