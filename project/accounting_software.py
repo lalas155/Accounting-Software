@@ -6,6 +6,7 @@ from mysql.connector.errors import DatabaseError
 from datetime import datetime
 import xlrd
 import requests
+from mysql.connector import errorcode
 
 def read_query(action):
     project_directory = os.path.dirname(os.path.realpath(__file__))
@@ -49,13 +50,13 @@ def connect_and_execute_query(company_host,company_user,company_password,company
     After that, it will execute a MySQL query which name has the format 'query_that_query_file_will_perform.sql'. If 'results' is set to 'True', results from query, if there is any, will be returned as a list.
     """
 
-    mydb = mysql.connector.connect(
+    my_database = mysql.connector.connect(
                                     host = company_host,
                                     user = company_user,
                                     password = company_password,
                                     database = company_db_name
                                     )
-    company_cursor = mydb.cursor()
+    company_cursor = my_database.cursor()
     sql_query = read_query(query_action)
     company_cursor.execute(sql_query)
 
@@ -85,12 +86,12 @@ def import_or_manual_sv_data_gathering():
         use_env_file = input("Would you like to import Server data from .env file? Type 'Yes' if you would like to, otherwise type 'No'.\n Answer: ")
     if use_env_file == "Yes":
         env_file_name = input("Insert the name of the .env file: ")
-        database_name = input("Please insert desired Database name: ")
+        database_name = input("Please insert Database name: ")
         return ["with env", env_file_name, database_name]
     elif use_env_file == "No":
         try:
             sv_data = ask_for_sv_data()
-            database_name = input("Please insert desired Database name: ")
+            database_name = input("Please insert Database name: ")
             return ["without env", sv_data,database_name]
         except DatabaseError as er:
             return print(er)
@@ -116,23 +117,52 @@ def get_correct_number(information_about_number,max_digits:int):
                     break
             return user_input
 
-def load_document_to_database():
+def load_document_to_database(server_data,database_name):
+    my_database = mysql.connector.connect(
+                                            host = server_data[0],
+                                            user = server_data[1],
+                                            password = server_data[2],
+                                            database = database_name
+                                        )
+    company_cursor = my_database.cursor()
     print("Welcome to Documentation load to database! Please fill in the fields.")
     document_information = ["", "", "", "", "", "", ""]
     loading = True
     while loading:
+        vat_base_105 = 0
+        vat_base_21 = 0
+        vat_base_27 = 0
+        vat_105 = 0
+        vat_21 = 0
+        vat_27 = 0
+        vat_withholdings = 0
+        gross_income_withholdings = 0
+        other_withholdings = 0
+        other_amounts_not_tax_base = 0
+        doc_table = "sales_docs"
+        table = ""
+        prefix = "20222222223"
+        name = ""
         while "" in document_information:
             vendor_or_client = "Vendor/Client"
             if document_information[1] in ["FCV","TIV","NCV","NDV"]:
                 vendor_or_client = "Client"
             elif document_information[1] in ["FCC","TIC","NCC","NDC"]:
-                vendor_or_client = "Vendor"
+                vendor_or_client = "Vendor"              
+            if vendor_or_client == "Client":
+                doc_table = "sales_docs"
+                table = "clients"
+                prefix = "client_"
+            elif vendor_or_client == "Vendor":
+                doc_table = "purchase_docs"
+                table = "clients"
+                prefix = "vendor_"
             print("0- Date: ",document_information[0])
             print("1- Type: ",document_information[1])
             print("2- Letter: ",document_information[2])
             print("3- PoS: ",document_information[3])
             print("4- Number: ",document_information[4])
-            print(f"5- {vendor_or_client} ID: ",document_information[5])
+            print(f"5- {vendor_or_client} ID: ",document_information[5], f"{vendor_or_client} Name: {name}")
             print("6- AFIP Type: ",document_information[6])
             print("7- Restart load.")
             option = input("Please insert the number of the information you would like to load: ")
@@ -178,6 +208,17 @@ def load_document_to_database():
                     print(f"{vendor_client_id} is not a valid {vendor_or_client} ID (11 Int Digits)!")
                     vendor_client_id = get_correct_number(f"{vendor_or_client} ID (11 Int Digits)", 11)
                 document_information[5] = vendor_client_id
+                try:
+                    name_query = f"SELECT {prefix}name FROM {table} WHERE {prefix}id = '{vendor_client_id}'"
+                    name = company_cursor.execute(name_query)
+                    result_from_query = company_cursor.fetchall()
+                    if len(result_from_query) != 1:
+                        name = f"Could not find {vendor_or_client} ID in Database."
+                    if len(result_from_query) == 1:
+                        name = result_from_query[0][0]
+                except mysql.connector.ProgrammingError as err:
+                    if err.errno == errorcode.ER_SYNTAX_ERROR:
+                        continue
             elif option == "6":
                 def get_afip_doc_types(afip_type):
                     project_directory = os.path.dirname(os.path.realpath(__file__))
@@ -188,7 +229,7 @@ def load_document_to_database():
                         afip_doc_types_url = "https://www.afip.gob.ar/fe/documentos/TABLACOMPROBANTES.xls"
                         request=requests.get(afip_doc_types_url)
                         open(project_directory+"/afip_doc_types.xls","wb").write(request.content)
-                    workbook = xlrd.open_workbook(project_directory+file_name)
+                    workbook = xlrd.open_workbook(project_directory + file_name)
                     sheet = workbook.sheet_by_index(0)
                     row_count = sheet.nrows
                     col_count = sheet.ncols
@@ -198,7 +239,7 @@ def load_document_to_database():
                             cell = sheet.cell(cur_row, cur_col)
                             raw_afip_doc_types.append(cell.value)
                     if afip_type in raw_afip_doc_types:
-                        return raw_afip_doc_types[raw_afip_doc_types.index(afip_type)+1]
+                        return afip_type ,raw_afip_doc_types[raw_afip_doc_types.index(afip_type)+1]
                     else:
                         return "Wrong"
                 afip_doc_type_input = input("Please insert AFIP Type of Document: ")
@@ -206,7 +247,7 @@ def load_document_to_database():
                 while afip_doc_type == "Wrong":
                     afip_doc_type_input = input("Please insert valid AFIP Type of Document: ")
                     afip_doc_type = get_afip_doc_types(afip_doc_type_input)
-                document_information[6] = afip_doc_type
+                document_information[6] = afip_doc_type[0]
             elif option == "7":
                 return "Restart"
         if document_information[2] in ("B", "C", "E"):
@@ -214,7 +255,7 @@ def load_document_to_database():
             document_total_amount = other_amounts_not_tax_base
             document_information.append(other_amounts_not_tax_base)
             document_information.append(document_total_amount)
-            print(f"Your are about to load the following Document:\n {doc_date} {user_type_input} {doc_letter} {document_POS}-{document_numb}\n {vendor_or_client} ID: {vendor_client_id}\n AFIP Type: {afip_doc_type_input}\n Total Document Amount: {document_total_amount}")
+            print(f"Your are about to load the following Document:\n {doc_date} {user_type_input} {doc_letter} {document_POS}-{document_numb}\n {vendor_or_client} ID: {vendor_client_id}    {vendor_or_client} Name: {name}\n AFIP Type: {afip_doc_type[0]}\n Total Document Amount: {document_total_amount}")
             final_check = input("Load to database? ('Yes' or 'Restart'): ")
             while final_check != "Yes" or "Restart":
                 final_check = input("Load to database? ('Yes' or 'Restart'): ")
@@ -274,36 +315,37 @@ def load_document_to_database():
                 elif option == "9":
                     other_amounts_not_tax_base = get_correct_number("the Document other amounts that do not match any of the criteria asked above.", 99)
                     document_amounts[9] = int(other_amounts_not_tax_base)
+                elif option == "11":
+                    return "Restart"
                 elif option == "10":
-                    print(f"Your are about to load the following Document:\n {doc_date} - {user_type_input} - {doc_letter} - {document_POS}-{document_numb}\n {vendor_or_client}: {vendor_client_id}\n AFIP Type: {afip_doc_type_input}\n VAT Base 10.5: {vat_base_105}    VAT 10.5: {vat_105}\n VAT Base 21:{vat_base_21}    VAT 21:{vat_21}\n VAT Base 27: {vat_base_27}    VAT 27: {vat_27}\n VAT Withholdings: {vat_withholdings}\n Gross Income Withholdings: {gross_income_withholdings}\n Other amounts: {other_amounts_not_tax_base}\n Total Document Amount: {document_total_amount}")
-                    final_check = input("Are you sure? ('Yes' or 'Restart')")
-                    while final_check != "Yes" or "Restart":
+                    print(f"Your are about to load the following Document:\n {doc_date} - {user_type_input} - {doc_letter} - {document_POS}-{document_numb}\n {vendor_or_client} ID: {vendor_client_id}    {vendor_or_client} Name: {name}\n AFIP Type: {afip_doc_type[0]}\n VAT Base 10.5: {vat_base_105}    VAT 10.5: {vat_105}\n VAT Base 21: {vat_base_21}    VAT 21: {vat_21}\n VAT Base 27: {vat_base_27}    VAT 27: {vat_27}\n VAT Withholdings: {vat_withholdings}\n Gross Income Withholdings: {gross_income_withholdings}\n Other amounts: {other_amounts_not_tax_base}\n Total Document Amount: {document_total_amount}")
+                    
+                    final_check = input("Are you sure? ('Yes' or 'Restart'): ")
+                    while final_check not in ["Yes", "Restart"]:
                         final_check = input("Load to database? ('Yes' or 'Restart'): ")
                     if final_check == "Restart":
                         return "Restart"
                     elif final_check == "Yes":
-                        break
-                elif option == "11":
-                    return "Restart"
-    document = []
-    document.append(vendor_or_client)
-    for information in document_information:
-        document.append(information)
-    for amounts in document_amounts:
-        document.append(amounts)
-    return document
+                        if document_information[2] in ("B", "C", "E"):
+                            sql_query = f"INSERT INTO {doc_table} (user_type_input, doc_letter, document_POS, document_numb, doc_date, vendor_id, afip_doc_type, vendor_name, other_amounts_not_vat_Base, total_document_amount) VALUES ({document_information[1]}, {document_information[2]}, {document_information[3]}, {document_information[4]}, {document_information[0]}, {vendor_client_id}, {name},{document_information[6]}, {other_amounts_not_tax_base}, {document_total_amount})"
+                        else:
+                            sql_query = f"INSERT INTO {doc_table} VALUES ({user_type_input}, {doc_letter}, {document_POS}, {document_numb}, {doc_date}, {vendor_client_id}, {document_information[6]}, {name}, {vat_base_105}, {vat_base_21}, {vat_base_27}, {vat_105}, {vat_21}, {vat_27}, {vat_withholdings}, {gross_income_withholdings}, {other_withholdings}, {other_amounts_not_tax_base}, {document_total_amount})"
 
-def operate_on_database(database):
-    option = input(f"What action would you like to perform on database {database}?\n 1- Load Bills/Invoices/Other Docs.\n 2- (Incoming) Other option\n Answer: ")
-    while option not in ["1", "2", "3", "4"]:
-        option = input(f"What action would you like to perform on database {database}?\n 1- Load Bills/Invoices/Other Docs.\n 2- (Incoming) Other option\n Answer: ")
-    if option == "1":
-        answer = load_document_to_database()
-        while answer == "Restart":
-            answer = load_document_to_database()
-    return
+                        company_cursor.execute(sql_query)
+    return "Restart"
 
-operate_on_database("coca")
+def operate_on_database(server_data,database_name):
+    while True:
+        option = input(f"What action would you like to perform on database {database_name}?\n 1- Load Bills/Invoices/Other Docs.\n 2- (Incoming) Other option\n Answer: ")
+        while option not in ["1", "2", "3", "4"]:
+            option = input(f"What action would you like to perform on database {database_name}?\n 1- Load Bills/Invoices/Other Docs.\n 2- (Incoming) Other option\n Answer: ")
+        if option == "1":
+            answer = load_document_to_database(server_data,database_name)
+            while answer == "Restart":
+                answer = load_document_to_database(server_data,database_name)
+
+db = ["localhost", "root", ""]
+operate_on_database(db ,"coca")
 
 
 # option = input("Hello, Welcome to this Accounting Software! Please enter the number of the action you would like to perform: \n 1- Create New Database. \n 2- Delete an existing Database. \n 3- Operate with an existing Database.\n 4- Close the Program.\n Answer: ")
@@ -332,16 +374,18 @@ operate_on_database("coca")
 # elif option == "4":
 #     print("Closing program! Have a nice day.")
 # elif option == "3":
-    # sv_data_and_db_name = import_or_manual_sv_data_gathering()
-    # if sv_data_and_db_name[0] == "with env":
-    #     env_data = read_env_file(sv_data_and_db_name[1])
-    #     checking_sv_conn = connect_and_execute_query(env_data[0], env_data[1], env_data[2], f"{sv_data_and_db_name[2]}", "check",True)
-    # else:
-    #     data_list = []
-    #     for data in sv_data_and_db_name[1]:
-    #         data_list.append(data)
-    #     checking_sv_conn = connect_and_execute_query(data_list[0], data_list[1], data_list[2], f"{sv_data_and_db_name[2]}", "check", True)
-    # if len(checking_sv_conn) == 0:
-    #     print("Connection Error!")
-    # else:
-    #     operate_on_database(sv_data_and_db_name[2])
+#     env_or_manual_and_db_name = import_or_manual_sv_data_gathering()
+#     server_data = []
+#     if env_or_manual_and_db_name[0] == "with env":
+#         env_data = read_env_file(env_or_manual_and_db_name[1])
+#         checking_sv_conn = connect_and_execute_query(env_data[0], env_data[1], env_data[2], f"{env_or_manual_and_db_name[2]}", "check",True)
+#         for data in env_data:
+#             server_data.append(data)
+#     elif env_or_manual_and_db_name[0] == "without env":
+#         for data in env_or_manual_and_db_name[1]:
+#             server_data.append(data)
+#         checking_sv_conn = connect_and_execute_query(server_data[0], server_data[1], server_data[2], f"{env_or_manual_and_db_name[2]}", "check", True)
+#     if len(checking_sv_conn) == 0:
+#         print("Connection Error!")
+#     else:
+#         operate_on_database(server_data,env_or_manual_and_db_name[2])
