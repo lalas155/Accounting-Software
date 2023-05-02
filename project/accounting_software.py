@@ -255,14 +255,17 @@ def load_document_to_database(server_data,database_name):
             document_total_amount = other_amounts_not_tax_base
             document_information.append(other_amounts_not_tax_base)
             document_information.append(document_total_amount)
-            print(f"Your are about to load the following Document:\n {doc_date} {user_type_input} {doc_letter} {document_POS}-{document_numb}\n {vendor_or_client} ID: {vendor_client_id}    {vendor_or_client} Name: {name}\n AFIP Type: {afip_doc_type[0]}\n Total Document Amount: {document_total_amount}")
+            print(f"Your are about to load the following Document:\n {doc_date} - {user_type_input} - {doc_letter} - {document_POS}-{document_numb}\n {vendor_or_client} ID: {vendor_client_id}    {vendor_or_client} Name: {name}\n AFIP Type: {afip_doc_type[0]}\n Total Document Amount: {document_total_amount}")
             final_check = input("Load to database? ('Yes' or 'Restart'): ")
-            while final_check != "Yes" or "Restart":
+            while final_check not in ["Yes", "Restart"]:
                 final_check = input("Load to database? ('Yes' or 'Restart'): ")
             if final_check == "Restart":
                 return "Restart"
             elif final_check == "Yes":
-                return document_information
+                sql_query = f"INSERT INTO {doc_table} (doc_date, user_type_input, doc_letter, document_POS, document_numb, {prefix}id, {prefix}name, afip_doc_type, other_amounts_not_vat_Base, total_document_amount) VALUES ('{datetime.strftime(doc_date, pattern)}', '{user_type_input}', '{doc_letter}', '{document_POS}', '{document_numb}', '{vendor_client_id}', '{name}', '{document_information[6]}', {other_amounts_not_tax_base}, {document_total_amount})"
+                company_cursor.execute(sql_query)
+                my_database.commit()
+                return "Restart"
         else:
             keep_loading = True
             document_amounts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -326,12 +329,10 @@ def load_document_to_database(server_data,database_name):
                     if final_check == "Restart":
                         return "Restart"
                     elif final_check == "Yes":
-                        if document_information[2] in ("B", "C", "E"):
-                            sql_query = f"INSERT INTO {doc_table} (user_type_input, doc_letter, document_POS, document_numb, doc_date, vendor_id, afip_doc_type, vendor_name, other_amounts_not_vat_Base, total_document_amount) VALUES ({document_information[1]}, {document_information[2]}, {document_information[3]}, {document_information[4]}, {document_information[0]}, {vendor_client_id}, {name},{document_information[6]}, {other_amounts_not_tax_base}, {document_total_amount})"
-                        else:
-                            sql_query = f"INSERT INTO {doc_table} VALUES ({user_type_input}, {doc_letter}, {document_POS}, {document_numb}, {doc_date}, {vendor_client_id}, {document_information[6]}, {name}, {vat_base_105}, {vat_base_21}, {vat_base_27}, {vat_105}, {vat_21}, {vat_27}, {vat_withholdings}, {gross_income_withholdings}, {other_withholdings}, {other_amounts_not_tax_base}, {document_total_amount})"
-
+                        sql_query = f"INSERT INTO {doc_table} VALUES ('{datetime.strftime(doc_date, pattern)}', '{user_type_input}', '{doc_letter}', '{document_POS}', '{document_numb}', '{vendor_client_id}', '{name}','{document_information[6]}', {vat_base_105}, {vat_base_21}, {vat_base_27}, {vat_105}, {vat_21}, {vat_27}, {vat_withholdings}, {gross_income_withholdings}, {other_withholdings}, {other_amounts_not_tax_base}, {document_total_amount})"
                         company_cursor.execute(sql_query)
+                        my_database.commit()
+                        return "Restart"
     return "Restart"
 
 def operate_on_database(server_data,database_name):
@@ -389,3 +390,5 @@ operate_on_database(db ,"coca")
 #         print("Connection Error!")
 #     else:
 #         operate_on_database(server_data,env_or_manual_and_db_name[2])
+
+# ""
