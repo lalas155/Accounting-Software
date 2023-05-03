@@ -8,6 +8,8 @@ import xlrd
 import requests
 from mysql.connector import errorcode
 import pandas as pd
+import pymysql
+import pandas.io.sql as sql
 
 
 def read_query(action):
@@ -20,7 +22,7 @@ def read_query(action):
         logging.error(f'Could not find {action}.sql file.')
     return sql_query
 
-def create_database(company_host,company_user,company_password,company_db_name):
+def create_database(company_host, company_user, company_password, company_db_name):
     mydb = mysql.connector.connect(
                                     host = company_host,
                                     user = company_user,
@@ -30,7 +32,7 @@ def create_database(company_host,company_user,company_password,company_db_name):
     company_cursor.execute(f"CREATE DATABASE IF NOT EXISTS {company_db_name};")
     return print("Database succesfully created!")
 
-def delete_database(company_host,company_user,company_password,company_db_name):
+def delete_database(company_host, company_user, company_password, company_db_name):
     you_sure = input(f"Are you sure u want to delete {company_db_name} forever? (That is a lot of time!). If sure, type Yes, otherwise type anything you want.")
     if you_sure == "Yes":
         mydb=mysql.connector.connect(
@@ -45,29 +47,18 @@ def delete_database(company_host,company_user,company_password,company_db_name):
     else:
         print("Operation Cancelled!")
 
-def connect_and_execute_query(company_host,company_user,company_password,company_db_name,query_action,results:bool):
+def connect_and_execute_query(company_host, company_user, company_password, company_db_name, query_action, results:bool):
 
     """
     This function will attempt to connect to MySQL database using company host, user, password and database name as inputs.\n 
-    After that, it will execute a MySQL query which name has the format 'query_that_query_file_will_perform.sql'. If 'results' is set to 'True', results from query, if there is any, will be returned as a list of tuples.
+    After that, it will execute a MySQL query which name has the format 'action_that_query_will_perform.sql'. If 'results' is set to 'True', results from query, if there is any, will be returned.
     """
 
-    my_database = mysql.connector.connect(
-                                    host = company_host,
-                                    user = company_user,
-                                    password = company_password,
-                                    database = company_db_name
-                                    )
-    company_cursor = my_database.cursor()
     sql_query = read_query(query_action)
-    company_cursor.execute(sql_query)
-
+    con = pymysql.connect(user=company_user, password=company_password, database=company_db_name, host=company_host)
     if results == True:
-        result_from_query = company_cursor.fetchall()
-        output_list=[]
-        for res in result_from_query:
-            output_list.append(res)
-        return output_list
+        output = sql.read_sql(sql_query, con)
+        return  output
 
 def ask_for_sv_data():
     host = input("Please insert host name (default localhost if using XAMPP): ")
@@ -99,7 +90,7 @@ def import_or_manual_sv_data_gathering():
             return print(er)
     return
 
-def get_correct_number(information_about_number,max_digits:int):
+def get_correct_number(information_about_number, max_digits:int):
             """
             Information about number: a description of what kind of information the input you are asking for represents.
             Asks for an integer input and checks if it is. Keeps asking for it as long as it is not an integer.
@@ -119,7 +110,7 @@ def get_correct_number(information_about_number,max_digits:int):
                     break
             return user_input
 
-def load_document_to_database(server_data,database_name):
+def load_document_to_database(server_data, database_name):
     my_database = mysql.connector.connect(
                                             host = server_data[0],
                                             user = server_data[1],
@@ -359,7 +350,7 @@ def load_document_to_database(server_data,database_name):
                         return "Restart"
     return "Restart"
 
-def operate_on_database(server_data,database_name):
+def operate_on_database(server_data, database_name):
     while True:
         option = input(f"What action would you like to perform on database {database_name}?\n 1- Load Bills/Invoices/Other Docs.\n 2- Get Sales / Purchase Reports.\n 3- (Incoming) Other option\n Answer: ")
         while option not in ["1", "2", "3", "4"]:
@@ -378,16 +369,10 @@ def operate_on_database(server_data,database_name):
                 continue
             elif sales_or_purchase_report == "S":
                 sales_report = connect_and_execute_query(server_data[0], server_data[1], server_data[2], database_name, "get_sales_report", True)
-                print(sales_report)
-                df_sales_report = pd.DataFrame(sales_report)
-                print(df_sales_report)
-                # df_sales_report.to_excel("Sales_Report.xlsx", header=False, index=False, )
-                pd.read_sql()
+                sales_report.to_excel("Sales_Report.xlsx", index=False)
 
 
-datos = ["localhost", "root", ""]
-sv = "coca"
-operate_on_database(datos,sv)
+
 
 option = input("Hello, Welcome to this Accounting Software! Please enter the number of the action you would like to perform: \n 1- Create New Database. \n 2- Delete an existing Database. \n 3- Operate with an existing Database.\n 4- Close the Program.\n Answer: ")
 
@@ -425,8 +410,5 @@ elif option == "3":
     elif env_or_manual_and_db_name[0] == "without env":
         for data in env_or_manual_and_db_name[1]:
             server_data.append(data)
-        checking_sv_conn = connect_and_execute_query(server_data[0], server_data[1], server_data[2], f"{env_or_manual_and_db_name[2]}", "check", True)
-    if len(checking_sv_conn) == 0:
-        print("Connection Error!")
-    else:
+        checking_sv_conn = connect_and_execute_query(server_data[0], server_data[1], server_data[2], f"{env_or_manual_and_db_name[2]}", "check", False)
         operate_on_database(server_data,env_or_manual_and_db_name[2])
