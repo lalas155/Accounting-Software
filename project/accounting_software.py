@@ -143,7 +143,10 @@ def load_document_to_database(server_data,database_name):
         table = ""
         prefix = "20222222223"
         name = ""
-        while "" in document_information:
+        initial_info = True
+        amounts_info = True
+        afip_doc_type = ["", ""]
+        while ("" in document_information) or (initial_info):
             vendor_or_client = "Vendor/Client"
             if document_information[1] in ["FCV","TIV","NCV","NDV"]:
                 vendor_or_client = "Client"
@@ -162,9 +165,14 @@ def load_document_to_database(server_data,database_name):
             print("2- Letter: ",document_information[2])
             print("3- PoS: ",document_information[3])
             print("4- Number: ",document_information[4])
-            print(f"5- {vendor_or_client} ID: ",document_information[5], f"{vendor_or_client} Name: {name}")
-            print("6- AFIP Type: ",document_information[6])
-            print("7- Restart load.")
+            print(f"5- {vendor_or_client} ID: ",document_information[5], f"- {vendor_or_client} Name: {name}")
+            print("6- AFIP Type: ",document_information[6], F"- {afip_doc_type[1]}")
+            if "" in document_information:
+                pass
+            else:
+                print("\n7- Continue to load amounts.")
+            print("\n8- Restart load.")
+            print("9- Leave.")
             option = input("Please insert the number of the information you would like to load: ")
             if option == "1":
                 def type_input():
@@ -248,8 +256,12 @@ def load_document_to_database(server_data,database_name):
                     afip_doc_type_input = input("Please insert valid AFIP Type of Document: ")
                     afip_doc_type = get_afip_doc_types(afip_doc_type_input)
                 document_information[6] = afip_doc_type[0]
-            elif option == "7":
+            elif option == "8":
                 return "Restart"
+            elif option == "9":
+                return "Leave"
+            elif option == "7":
+                initial_info = False
         if document_information[2] in ("B", "C", "E"):
             other_amounts_not_tax_base = get_correct_number("the total amount of the Document.", 99)
             document_total_amount = other_amounts_not_tax_base
@@ -267,9 +279,8 @@ def load_document_to_database(server_data,database_name):
                 my_database.commit()
                 return "Restart"
         else:
-            keep_loading = True
             document_amounts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-            while keep_loading:
+            while amounts_info:
                 document_total_amount = 0
                 for i in range(0, len(document_amounts) - 1):
                     document_total_amount += document_amounts[i]
@@ -285,8 +296,12 @@ def load_document_to_database(server_data,database_name):
                 print("8- Other Withholdings: ",document_amounts[8])
                 print("9- Other Amounts: ",document_amounts[9])
                 print("Total Amount: ",document_amounts[10])
-                print("\n10- Load Document")
-                print("11- Restart load.")
+                if all(amount == 0 for amount in document_amounts):
+                    pass
+                else:
+                    print("\n10- Load Document")
+                print("11- Back to previous page.")
+                print("12- Restart load.")
                 option = input("Please insert the number of the information you would like to load: ")
                 if option == "0":
                     vat_base_105 = get_correct_number("the Document 10.5% VAT Base.", 99)
@@ -318,16 +333,23 @@ def load_document_to_database(server_data,database_name):
                 elif option == "9":
                     other_amounts_not_tax_base = get_correct_number("the Document other amounts that do not match any of the criteria asked above.", 99)
                     document_amounts[9] = int(other_amounts_not_tax_base)
-                elif option == "11":
+                elif option == "12":
                     return "Restart"
+                elif option == "11":
+                    amounts_info = False
+                    initial_info = True
                 elif option == "10":
+
                     print(f"Your are about to load the following Document:\n {doc_date} - {user_type_input} - {doc_letter} - {document_POS}-{document_numb}\n {vendor_or_client} ID: {vendor_client_id}    {vendor_or_client} Name: {name}\n AFIP Type: {afip_doc_type[0]}\n VAT Base 10.5: {vat_base_105}    VAT 10.5: {vat_105}\n VAT Base 21: {vat_base_21}    VAT 21: {vat_21}\n VAT Base 27: {vat_base_27}    VAT 27: {vat_27}\n VAT Withholdings: {vat_withholdings}\n Gross Income Withholdings: {gross_income_withholdings}\n Other amounts: {other_amounts_not_tax_base}\n Total Document Amount: {document_total_amount}")
                     
-                    final_check = input("Are you sure? ('Yes' or 'Restart'): ")
-                    while final_check not in ["Yes", "Restart"]:
-                        final_check = input("Load to database? ('Yes' or 'Restart'): ")
+                    final_check = input("Are you sure? ('Yes', 'Back' or 'Restart'): ")
+                    while final_check not in ["Yes", 'Back', "Restart"]:
+                        final_check = input("Load to database? ('Yes', 'Back' or 'Restart'): ")
                     if final_check == "Restart":
                         return "Restart"
+                    elif final_check == "Back":
+                        initial_info = False
+                        amounts_info = True
                     elif final_check == "Yes":
                         sql_query = f"INSERT INTO {doc_table} VALUES ('{datetime.strftime(doc_date, pattern)}', '{user_type_input}', '{doc_letter}', '{document_POS}', '{document_numb}', '{vendor_client_id}', '{name}','{document_information[6]}', {vat_base_105}, {vat_base_21}, {vat_base_27}, {vat_105}, {vat_21}, {vat_27}, {vat_withholdings}, {gross_income_withholdings}, {other_withholdings}, {other_amounts_not_tax_base}, {document_total_amount})"
                         company_cursor.execute(sql_query)
@@ -344,9 +366,12 @@ def operate_on_database(server_data,database_name):
             answer = load_document_to_database(server_data,database_name)
             while answer == "Restart":
                 answer = load_document_to_database(server_data,database_name)
+            if answer == "Leave":
+                continue
 
-
-
+datos = ["localhost", "root", ""]
+sv = "coca"
+operate_on_database(datos,sv)
 
 option = input("Hello, Welcome to this Accounting Software! Please enter the number of the action you would like to perform: \n 1- Create New Database. \n 2- Delete an existing Database. \n 3- Operate with an existing Database.\n 4- Close the Program.\n Answer: ")
 
