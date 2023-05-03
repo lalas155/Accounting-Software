@@ -369,9 +369,6 @@ def operate_on_database(server_data,database_name):
             if answer == "Leave":
                 continue
 
-datos = ["localhost", "root", ""]
-sv = "coca"
-operate_on_database(datos,sv)
 
 option = input("Hello, Welcome to this Accounting Software! Please enter the number of the action you would like to perform: \n 1- Create New Database. \n 2- Delete an existing Database. \n 3- Operate with an existing Database.\n 4- Close the Program.\n Answer: ")
 
