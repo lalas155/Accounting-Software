@@ -7,6 +7,8 @@ from datetime import datetime
 import xlrd
 import requests
 from mysql.connector import errorcode
+import pandas as pd
+
 
 def read_query(action):
     project_directory = os.path.dirname(os.path.realpath(__file__))
@@ -47,7 +49,7 @@ def connect_and_execute_query(company_host,company_user,company_password,company
 
     """
     This function will attempt to connect to MySQL database using company host, user, password and database name as inputs.\n 
-    After that, it will execute a MySQL query which name has the format 'query_that_query_file_will_perform.sql'. If 'results' is set to 'True', results from query, if there is any, will be returned as a list.
+    After that, it will execute a MySQL query which name has the format 'query_that_query_file_will_perform.sql'. If 'results' is set to 'True', results from query, if there is any, will be returned as a list of tuples.
     """
 
     my_database = mysql.connector.connect(
@@ -359,7 +361,7 @@ def load_document_to_database(server_data,database_name):
 
 def operate_on_database(server_data,database_name):
     while True:
-        option = input(f"What action would you like to perform on database {database_name}?\n 1- Load Bills/Invoices/Other Docs.\n 2- (Incoming) Other option\n Answer: ")
+        option = input(f"What action would you like to perform on database {database_name}?\n 1- Load Bills/Invoices/Other Docs.\n 2- Get Sales / Purchase Reports.\n 3- (Incoming) Other option\n Answer: ")
         while option not in ["1", "2", "3", "4"]:
             option = input(f"What action would you like to perform on database {database_name}?\n 1- Load Bills/Invoices/Other Docs.\n 2- (Incoming) Other option\n Answer: ")
         if option == "1":
@@ -368,7 +370,24 @@ def operate_on_database(server_data,database_name):
                 answer = load_document_to_database(server_data,database_name)
             if answer == "Leave":
                 continue
+        if option == "2":
+            sales_or_purchase_report = input("Please indicate if you would like to get Sales('S') or Purchase('P') report.\nTo go back type 'Back'.\n -Answer: ")
+            while sales_or_purchase_report not in ["S", "P", "Back"]:
+                sales_or_purchase_report = input("Please indicate if you would like to get Sales('S') or Purchase('P') report.")
+            if sales_or_purchase_report == "Back":
+                continue
+            elif sales_or_purchase_report == "S":
+                sales_report = connect_and_execute_query(server_data[0], server_data[1], server_data[2], database_name, "get_sales_report", True)
+                print(sales_report)
+                df_sales_report = pd.DataFrame(sales_report)
+                print(df_sales_report)
+                # df_sales_report.to_excel("Sales_Report.xlsx", header=False, index=False, )
+                pd.read_sql()
 
+
+datos = ["localhost", "root", ""]
+sv = "coca"
+operate_on_database(datos,sv)
 
 option = input("Hello, Welcome to this Accounting Software! Please enter the number of the action you would like to perform: \n 1- Create New Database. \n 2- Delete an existing Database. \n 3- Operate with an existing Database.\n 4- Close the Program.\n Answer: ")
 
